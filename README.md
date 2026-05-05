@@ -8,6 +8,9 @@ Project ini tidak hanya fokus pada model, tapi juga **pipeline dan kesiapan ke M
 
 ---
 
+## Dataset
+https://drive.google.com/drive/folders/1JKEizWzVXWr6IQaxmcGP02StO3l-3-VB?usp=drive_link
+
 ## ⚙️ Tech Stack
 
 * Python
