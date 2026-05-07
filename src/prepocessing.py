@@ -13,6 +13,7 @@ def standard(df):
     df['price_idr'] = pd.to_numeric(df['price_idr'], errors='coerce')
     df['garage'] = df['garage'].fillna(0)
     df['title'] = df['title'].str.lower()
+    df['district'] = df['district'].str.lower()
     return df
 
 #  Filtering Collumns
@@ -22,12 +23,12 @@ def filtering(df):
         df = df[(df[col] != df['land_size_m2']) & (df[col] != df['building_size_m2'])]
     df = df[(df['price_idr'] > 0) & (df['bedrooms'] > 0) & (df['bathrooms'] > 0)]
     df = df[(df['building_size_m2'] >= 30) & (df['land_size_m2'] >= 30 )]
-    df['bedrooms']  = df['bedrooms'].clip(upper=20)
-    df['bathrooms'] = df['bathrooms'].clip(upper=20)
-    df['garage']    = df['garage'].clip(upper=20)
+    # df['bedrooms']  = df['bedrooms'].clip(upper=20)
+    # df['bathrooms'] = df['bathrooms'].clip(upper=20)
+    # df['garage']    = df['garage'].clip(upper=20)
     df['price_idr'] = df['price_idr'].clip(
-        df['price_idr'].quantile(0.01),
-        df['price_idr'].quantile(0.99))
+        df['price_idr'].quantile(0.02),
+        df['price_idr'].quantile(0.98))
     df = df.drop(index=df[(df['price_idr'] > 100_000_000_000) & ((df['land_size_m2'] < 100) | (df['building_size_m2'] < 100))].index)
 
     df = df[(df['rumah_sakit'] == 0) & (df['kos'] == 0)]

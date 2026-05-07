@@ -16,16 +16,16 @@ def format_rupiah(x):
     return f"Rp {int(x):,}".replace(",", ".")
 
 col = {
-    'bedrooms': 5,
-    'bathrooms': 5,
-    'garage' : 2,
-    'land_size_m2': np.log1p(433),
-    'building_size_m2' : np.log1p(350),
+    'bedrooms': 3,
+    'bathrooms': 2,
+    'garage' : 1,
+    'land_size_m2': np.log1p(150),
+    'building_size_m2' : np.log1p(120),
     'cluster': 0,
     'pool' : 0,
-    'mrt' : 0,
-    'tol' : 0,
-    'mall' : 0,
+    'mrt' : 1,
+    'tol' : 1,
+    'mall' : 1,
     'scbd' : 0,
     'city_Jakarta Barat': 0,
     'city_Jakarta Pusat': 0,
@@ -35,7 +35,7 @@ col = {
 }
 
 df = pd.DataFrame([col])
-df['district'] = 'Pondok Indah'
+df['district'] = 'tebet'
 df['district_encoded'] = encoder_main.transform(df[['district']]).flatten()
 df = df.drop(columns='district')
 df = df[model_main.feature_names_in_]
