@@ -21,7 +21,7 @@ def format_rupiah(x):
 col = {
     'bedrooms': 3,
     'bathrooms': 6,
-    'garage' : 3,
+    'garage' : 0,
     'land_size_m2': 350,
     'building_size_m2' : 340,
     'cluster': 1,

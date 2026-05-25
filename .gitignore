@@ -4,5 +4,4 @@ __pycache__/
 data/raw/
 data/processed/
 .env
-.DS_Store
 models
