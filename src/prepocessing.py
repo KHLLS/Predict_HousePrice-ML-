@@ -1,305 +1,11 @@
 import pandas as pd
 import numpy as np
+import json
+from pathlib import Path
 
 PATH = "data/raw/jakarta_properties_raw.csv" # input path sample data
-mapping = {
-    "alfa indah": "cengkareng",
-    "ampera": "pasar minggu",
-    "ancol": "pademangan",
-    "angke": "tambora",
-    "antasari": "cilandak",
-    "arjuna utara": "grogol petamburan",
-    "bambu apus": "cipayung",
-    "bandengan": "penjaringan",
-    "bangka": "mampang prapatan",
-    "batu ceper": "gambir",
-    "batutulis": "gambir",
-    "bedungan jatiluhur": "tanah abang",
-    "bendungan hilir": "tanah abang",
-    "bintaro": "pesanggrahan",
-    "blok m": "kebayoran baru",
-    "bojong indah": "kembangan",
-    "buaran": "duren sawit",
-    "bukit duri": "tebet",
-    "bungur": "senen",
-    "cakung": "cakung",
-    "casablanca": "tebet",
-    "cawang": "kramat jati",
-    "cempaka mas": "kemayoran",
-    "cempaka putih": "cempaka putih",
-    "cengkareng": "cengkareng",
-    "cengkareng barat": "cengkareng",
-    "cibubur": "ciracas",
-    "cideng": "gambir",
-    "ciganjur": "jagakarsa",
-    "cijantung": "pasar rebo",
-    "cikini": "menteng",
-    "cikoko": "pancoran",
-    "cilandak": "cilandak",
-    "cilangkap": "cipayung",
-    "cililitan": "kramat jati",
-    "cilincing": "cilincing",
-    "cinere": "cilandak",
-    "cipayung": "cipayung",
-    "cipedak": "jagakarsa",
-    "cipete": "kebayoran baru",
-    "cipinang": "pulo gadung",
-    "cipinang melayu": "makasar",
-    "cipulir": "kebayoran lama",
-    "ciracas": "ciracas",
-    "cirendeu": "pesanggrahan",
-    "citra garden": "kalideres",
-    "citra grand": "cakung",
-    "condet": "kramat jati",
-    "daan mogot": "kalideres",
-    "dadap": "penjaringan",
-    "duren sawit": "duren sawit",
-    "duren tiga": "pancoran",
-    "duri kepa": "kebon jeruk",
-    "duri kosambi": "cengkareng",
-    "duri pulo": "gambir",
-    "duta garden": "kalideres",
-    "fatmawati": "cilandak",
-    "gajah mada": "taman sari",
-    "gambir": "gambir",
-    "gandaria": "kebayoran baru",
-    "gatot subroto": "setiabudi",
-    "gelong baru": "grogol petamburan",
-    "glodok": "taman sari",
-    "golf island": "penjaringan",
-    "gondangdia": "menteng",
-    "graha bintaro": "pesanggrahan",
-    "green lake city": "cengkareng",
-    "green mansion": "kebon jeruk",
-    "green ville": "kebon jeruk",
-    "green garden": "kebon jeruk",
-    "grogol": "grogol petamburan",
-    "grogol petamburan": "grogol petamburan",
-    "gudang peluru": "tebet",
-    "guntur": "setiabudi",
-    "gunung sahari": "sawah besar",
-    "halim perdana kusuma": "makasar",
-    "harmoni": "gambir",
-    "hasyim ashari": "gambir",
-    "hayam wuruk": "taman sari",
-    "intercon": "kebon jeruk",
-    "jagakarsa": "jagakarsa",
-    "jakarta garden city": "cakung",
-    "jalan panjang": "kebon jeruk",
-    "jati cempaka": "duren sawit",
-    "jati padang": "pasar minggu",
-    "jatinegara": "jatinegara",
-    "jatiwaringin": "makasar",
-    "jelambar": "grogol petamburan",
-    "jembatan besi": "tambora",
-    "jembatan dua": "penjaringan",
-    "jembatan lima": "tambora",
-    "jembatan tiga": "penjaringan",
-    "jeruk purut": "cilandak",
-    "joglo": "kembangan",
-    "johar baru": "johar baru",
-    "kh mas mansyur": "tanah abang",
-    "kalibata": "pancoran",
-    "kalideres": "kalideres",
-    "kalimalang": "duren sawit",
-    "kalisari": "pasar rebo",
-    "kamal": "kalideres",
-    "kampung ambon": "pulo gadung",
-    "kampung rambutan": "ciracas",
-    "kapten tendean": "mampang prapatan",
-    "kapuk": "cengkareng",
-    "kapuk kamal": "penjaringan",
-    "kapuk muara": "penjaringan",
-    "karang anyar": "sawah besar",
-    "karet": "setiabudi",
-    "karet tengsin": "tanah abang",
-    "kartini": "sawah besar",
-    "kav dki": "duren sawit",
-    "kayu jati": "pulo gadung",
-    "kayu putih": "pulo gadung",
-    "kebagusan": "pasar minggu",
-    "kebayoran baru": "kebayoran baru",
-    "kebayoran lama": "kebayoran lama",
-    "kebon jeruk": "kebon jeruk",
-    "kebon kacang": "tanah abang",
-    "kebon melati": "tanah abang",
-    "kebon sirih": "menteng",
-    "kedoya": "kebon jeruk",
-    "kedoya baru": "kebon jeruk",
-    "kedoya garden": "kebon jeruk",
-    "kedoya selatan": "kebon jeruk",
-    "kedoya utara": "kebon jeruk",
-    "kelapa dua": "kebon jeruk",
-    "kelapa gading": "kelapa gading",
-    "kemandoran": "palmerah",
-    "kemang": "mampang prapatan",
-    "kemanggisan": "palmerah",
-    "kemayoran": "kemayoran",
-    "kembangan": "kembangan",
-    "kembangan baru": "kembangan",
-    "kembangan selatan": "kembangan",
-    "kepa duri": "kebon jeruk",
-    "klender": "duren sawit",
-    "koja": "koja",
-    "kota": "taman sari",
-    "kota bambu selatan": "palmerah",
-    "kota bambu utara": "palmerah",
-    "kota wisata": "ciracas",
-    "kramat": "senen",
-    "kramat jati": "kramat jati",
-    "kuningan": "setiabudi",
-    "lebak bulus": "cilandak",
-    "legenda wisata": "ciracas",
-    "lenteng agung": "jagakarsa",
-    "lubang buaya": "cipayung",
-    "makasar": "makasar",
-    "mampang": "mampang prapatan",
-    "mampang prapatan": "mampang prapatan",
-    "mangga besar": "taman sari",
-    "mangga dua": "penjaringan",
-    "manggarai": "tebet",
-    "marunda": "cilincing",
-    "matraman": "matraman",
-    "mega kuningan": "setiabudi",
-    "menteng": "menteng",
-    "menteng atas": "setiabudi",
-    "menteng dalam": "tebet",
-    "meruya": "kembangan",
-    "metland menteng": "cakung",
-    "metland puri": "kembangan",
-    "metro permata": "kalideres",
-    "muara karang": "penjaringan",
-    "mutiara kedoya": "kebon jeruk",
-    "otista": "jatinegara",
-    "pademangan": "pademangan",
-    "pakubuwono": "kebayoran baru",
-    "palmerah": "palmerah",
-    "pancoran": "pancoran",
-    "pangeran jayakarta": "sawah besar",
-    "panglima polim": "kebayoran baru",
-    "pantai indah kapuk": "penjaringan",
-    "pantai indah kapuk 2": "penjaringan",
-    "pantai mutiara": "penjaringan",
-    "pasar baru": "sawah besar",
-    "pasar minggu": "pasar minggu",
-    "pasar rebo": "pasar rebo",
-    "patal senayan": "kebayoran baru",
-    "pegadungan": "kalideres",
-    "pegangsaan": "menteng",
-    "pejaten": "pasar minggu",
-    "pejaten timur": "pasar minggu",
-    "pejompongan": "tanah abang",
-    "pengadegan": "pancoran",
-    "penggilingan": "cakung",
-    "penjaringan": "penjaringan",
-    "percetakan negara": "johar baru",
-    "permata buana": "kembangan",
-    "permata hijau": "kebayoran lama",
-    "pesanggrahan": "pesanggrahan",
-    "petojo": "gambir",
-    "petukangan": "pesanggrahan",
-    "pinang ranti": "makasar",
-    "pisangan lama": "matraman",
-    "pluit": "penjaringan",
-    "plumpang": "tanjung priok",
-    "pondok bambu": "duren sawit",
-    "pondok gede": "kramat jati",
-    "pondok indah": "kebayoran lama",
-    "pondok karya": "pesanggrahan",
-    "pondok kelapa": "duren sawit",
-    "pondok kopi": "duren sawit",
-    "pondok labu": "cilandak",
-    "pondok pinang": "kebayoran lama",
-    "pondok ranggon": "cipayung",
-    "pos pengumben": "kebon jeruk",
-    "praja dalam": "pesanggrahan",
-    "prapanca": "kebayoran baru",
-    "pulo asem": "pulo gadung",
-    "pulo gadung": "pulo gadung",
-    "pulogebang": "cakung",
-    "pulomas": "pulo gadung",
-    "puri indah": "kembangan",
-    "puri mansion": "kembangan",
-    "puri media": "kembangan",
-    "radio dalam": "kebayoran baru",
-    "raffles hills": "ciracas",
-    "ragunan": "pasar minggu",
-    "rawa badak": "koja",
-    "rawa belong": "palmerah",
-    "rawa buaya": "cengkareng",
-    "rawajati": "pancoran",
-    "rawamangun": "pulo gadung",
-    "rempoa ciputat timur": "pesanggrahan",
-    "ring road": "kalideres",
-    "rorotan": "cilincing",
-    "roxy": "taman sari",
-    "ruko rawa lumbu": "duren sawit",
-    "s parman": "grogol petamburan",
-    "scbd": "setiabudi",
-    "saharjo": "tebet",
-    "salemba": "senen",
-    "samanhudi": "sawah besar",
-    "sawah besar": "sawah besar",
-    "sektor 1 - bintaro": "pesanggrahan",
-    "sektor 2 - bintaro": "pesanggrahan",
-    "sektor 3 - bintaro": "pesanggrahan",
-    "sektor 3a-bintaro": "pesanggrahan",
-    "sektor 4 - bintaro": "pesanggrahan",
-    "sektor 5-bintaro": "pesanggrahan",
-    "sektor 6-bintaro": "pesanggrahan",
-    "sektor 8-bintaro": "pesanggrahan",
-    "semanan": "kalideres",
-    "semper": "cilincing",
-    "senayan": "tanah abang",
-    "senen": "senen",
-    "senopati": "kebayoran baru",
-    "setiabudi": "setiabudi",
-    "setu": "cipayung",
-    "simprug": "kebayoran lama",
-    "simprug garden": "kebayoran lama",
-    "slipi": "palmerah",
-    "srengseng": "kembangan",
-    "sudirman": "setiabudi",
-    "sumur batu": "kemayoran",
-    "sunrise garden": "kebon jeruk",
-    "sunter": "tanjung priok",
-    "supomo": "tebet",
-    "tb simatupang": "pasar minggu",
-    "taman anggrek": "grogol petamburan",
-    "taman cosmos": "cengkareng",
-    "taman grisenda": "grogol petamburan",
-    "taman kencana": "grogol petamburan",
-    "taman kota": "kembangan",
-    "taman meruya": "kembangan",
-    "taman mini": "cipayung",
-    "taman palem": "cengkareng",
-    "taman ratu": "kebon jeruk",
-    "taman surya": "cengkareng",
-    "tamansari": "taman sari",
-    "tambora": "tambora",
-    "tanah abang": "tanah abang",
-    "tanah kusir": "kebayoran lama",
-    "tanjung barat": "jagakarsa",
-    "tanjung duren": "grogol petamburan",
-    "tanjung duren selatan": "grogol petamburan",
-    "tanjung duren utara": "grogol petamburan",
-    "tanjung priok": "tanjung priok",
-    "tawakal": "grogol petamburan",
-    "tebet": "tebet",
-    "teluk gong": "penjaringan",
-    "terogong": "cilandak",
-    "thamrin": "menteng",
-    "tomang": "grogol petamburan",
-    "tubagus angke": "tambora",
-    "ulujami": "pesanggrahan",
-    "utan kayu": "matraman",
-    "veteran": "gambir",
-    "villa meruya": "kembangan",
-    "wahid hasyim": "menteng",
-    "warung buncit": "mampang prapatan",
-    "wijaya": "kebayoran baru",
-    "patra kuningan": "setiabudi"
-}
+MAPPING_PATH = "data/district_mapping.json" # mapping district -> kecamatan
+LOG_UNKNOWN_PATH = "log/unknown_district.log" # log district yang belum ada di mapping
 
 # Load dataset from path
 def load_dataset(path):
@@ -311,7 +17,6 @@ def standard(df):
     df['price_idr'] = pd.to_numeric(df['price_idr'], errors='coerce')
     df['garage'] = df['garage'].fillna(0)
     df['title'] = df['title'].str.lower()
-    df['district'] = df['district'].str.lower()
     return df
 
 #  Filtering Collumns
@@ -321,15 +26,15 @@ def filtering(df):
         df = df[(df[col] != df['land_size_m2']) & (df[col] != df['building_size_m2'])]
     df = df[(df['price_idr'] > 0) & (df['bedrooms'] > 0) & (df['bathrooms'] > 0)]
     df = df[(df['building_size_m2'] >= 30) & (df['land_size_m2'] >= 30 )]
-    # df['bedrooms']  = df['bedrooms'].clip(upper=20)
-    # df['bathrooms'] = df['bathrooms'].clip(upper=20)
-    # df['garage']    = df['garage'].clip(upper=20)
-    df['price_idr'] = df['price_idr'].clip(
-        df['price_idr'].quantile(0.02),
-        df['price_idr'].quantile(0.98))
-    df = df.drop(index=df[(df['price_idr'] > 100_000_000_000) & ((df['land_size_m2'] < 100) | (df['building_size_m2'] < 100))].index)
-
+    df = df[(df['bedrooms'] <= 30) & (df['bathrooms'] <= 30) & (df['garage'] <= 30)]
+    df = df.dropna(axis=0)
     df = df[(df['rumah_sakit'] == 0) & (df['kos'] == 0)]
+    lower = df['price_idr'].quantile(0.1)
+    upper = df['price_idr'].quantile(0.98)
+    df = df[
+        (df['price_idr'] >= lower) &
+        (df['price_idr'] <= upper)
+    ]
     return df
 
 # Feature engineering
@@ -349,35 +54,57 @@ def feature(df):
     df['mall'] = df['title'].str.contains(
         r'mall', na=False
         ).astype(int)
-    df['scbd'] = df['title'].str.contains(
-        r'scbd', na=False
-        ).astype(int)
     df['kos'] = df['title'].str.contains(
         r'kos|kost|kostan|kosan', na=False
         ).astype(int)
-    # df['sub_district'] = df['district'].copy()
-    df['district'] = df['district'].map(mapping)
     df['rumah_sakit'] = (df['title'].str.contains(
         r'rumah sakit', na=False) &~ df['title'].str.contains(r'dekat|near|sekitar|selangkah', na=False)
         ).astype(int)
     return df
 
-# Transformization 
+# Transformization
 def transform(df):
     df['land_size_m2'] = np.log1p(df['land_size_m2'])
     df['building_size_m2'] = np.log1p(df['building_size_m2'])
-    # df['price_idr_log'] = np.log1p(df['price_idr'])
+    df['price_idr'] = np.log1p(df['price_idr'])
     return df
 
-# Encode 
+# Encode
 def encode(df):
     df = pd.get_dummies(df, columns=['city'], dtype=int) #One Hot Encoding (OHE)
     return df
 
-# Drop collumns 
+# Drop collumns
 def drop(df):
-    df = df.dropna(axis=0)
     df = df.drop(columns=['title','scraped_at','rumah_sakit','kos'])
+    return df
+
+# Mapping district ke kecamatan, log district yang belum ada di mapping
+def district_mapping(df):
+    with open(MAPPING_PATH, "r") as file:
+        mapping = json.load(file)
+
+    df['district'] = df['district'].str.lower()
+    unknown = set(df[~df['district'].isin(mapping.keys())]['district'].unique())
+
+    if len(unknown) > 0:
+        print(f"{len(unknown)} district tidak ada di mapping:")
+        for d in sorted(unknown):
+            print(f" - '{d}'")
+
+    log_unknown = Path(LOG_UNKNOWN_PATH)
+    logged = set()
+    if log_unknown.exists():
+        with open(log_unknown, "r") as file:
+            logged = {i.strip() for i in file}
+
+    new_unknown = unknown - logged
+    if new_unknown:
+        with open(log_unknown, "a") as file:
+            for d in sorted(new_unknown):
+                file.write(f"{d}\n")
+
+    df['district'] = df['district'].map(mapping)
     return df
 
 # Run Pipeline
@@ -389,6 +116,7 @@ def pipeline():
     df = transform(df)
     df = encode(df)
     df = drop(df)
+    df = district_mapping(df)
     return df
 
 # Save
@@ -399,6 +127,3 @@ def save(df):
 if __name__ == "__main__":
     df = pipeline()
     save(df)
-
-
-

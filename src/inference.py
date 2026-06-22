@@ -1,57 +1,50 @@
-import pandas as pd
 import numpy as np
-import joblib
+import pandas as pd
+import joblib, json
 
-def load_data():
-    model_main = joblib.load('models/model_main.pkl')
-    model_elite = joblib.load('models/model_elite.pkl')
-    encoder_main = joblib.load('models/encoder/encoder_main.pkl')
-    encoder_elite = joblib.load('models/encoder/encoder_elite.pkl')
-    return model_main, model_elite,encoder_main, encoder_elite
+def load_models():
+    model   = joblib.load("models/model.pkl")
+    encoder = joblib.load("models/encoder/encoder.pkl")
+    with open("models/metrics_model.json", "r") as file:
+        metrics = json.load(file)
+    return model, encoder, metrics
 
-model_main, model_elite,encoder_main, encoder_elite = load_data()
+def predict(data):
+    model, encoder, metrics = load_models()
 
-class Predict():
-    num_col = ['bedrooms','bathrooms','garage','land_size_m2','building_size_m2']
-    def __init__(self,data):
-        self.data = data
-    
-    def validation(self):
-        data = self.data
-        for i in self.num_col:
-            if i == 'garage':
-                if data.loc[0,i] < 0:
-                    raise ValueError('garage must be >= 0')
-            elif data.loc[0,i] <= 0:
-                raise ValueError(f'{i} must be > 0')
-        return data
-    
-    def transformation(self):
-        df = self.validation().copy()
-        df['land_size_m2'] = np.log1p(df['land_size_m2'])
-        df['building_size_m2'] = np.log1p(df['building_size_m2'])
-        return df
+    df = pd.DataFrame([data])
 
-    def predict(self):
-        df = self.transformation()
-        df_main = df.copy()
-        df_main['district_encoded'] = encoder_main.transform(df_main[['district']]).flatten()
-        df_main = df_main.drop(columns='district')
-        df_main = df_main[model_main.feature_names_in_]
-        result = model_main.predict(df_main)[0]
-        if result >= 20_000_000_000:
-            df_elite = df.copy()
-            df_elite['district_encoded'] = encoder_elite.transform(df_elite[['district']]).flatten()
-            df_elite = df_elite.drop(columns='district')
-            df_elite = df_elite[model_elite.feature_names_in_]
-            result = model_elite.predict(df_elite)[0]
-        return result
-    
-if __name__ == '__main__':
-    tes = Predict()
+    # Log transform (sama dengan training)
+    df['land_size_m2']     = np.log1p(df['land_size_m2'])
+    df['building_size_m2'] = np.log1p(df['building_size_m2'])
 
+    # OHE city
+    city_cols = [
+        'city_Jakarta Barat',
+        'city_Jakarta Pusat',
+        'city_Jakarta Selatan',
+        'city_Jakarta Timur',
+        'city_Jakarta Utara',
+    ]
+    for col in city_cols:
+        df[col] = 0
+    city_key = f"city_{data.get('city', '')}"
+    if city_key in city_cols:
+        df[city_key] = 1
+    df = df.drop(columns=['city'], errors='ignore')
 
+    # Encode district
+    df['district'] = encoder.transform(df[['district']]).flatten()
 
+    # Prediksi
+    df = df[model.feature_names_in_]
+    price_log = model.predict(df)[0]
+    price = np.expm1(price_log)
 
+    # Membuat range prediksi dari harga low sampai high menggunakan median presentase error
+    return {
+        "price": round(price),
+        "price_low": round(price - (price * metrics['Q50'])),
+        "price_high": round(price + (price * metrics['Q50'])),
+    }
 
-            
