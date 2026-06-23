@@ -16,7 +16,7 @@ Project ini membangun sistem prediksi harga rumah di Jakarta dari hulu ke hilir:
 
 ## 📊 Dataset
 
-Dataset properti Jakarta hasil scraping dari Rumah123.
+Dataset properti Jakarta.
 
 🔗 [Google Drive Dataset](https://drive.google.com/drive/folders/1JKEizWzVXWr6IQaxmcGP02StO3l-3-VB?usp=drive_link)
 
