@@ -4,7 +4,6 @@ from src.ml.inference import predictor
 
 router = APIRouter()
 
-
 @router.post("/predict", response_model=PredictResponse)
 def predict_price(body: PredictRequest):
     try:

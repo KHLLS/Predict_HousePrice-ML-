@@ -2,14 +2,15 @@ import pandas as pd
 import numpy as np
 import json
 from pathlib import Path
+from src.database.config import coll
 
-PATH = "data/raw/jakarta_properties_raw.csv" # input path sample data
 MAPPING_PATH = "data/district_mapping.json" # mapping district -> kecamatan
 LOG_UNKNOWN_PATH = "log/unknown_district.log" # log district yang belum ada di mapping
 
-# Load dataset from path
-def load_dataset(path):
-    df = pd.read_csv(path)
+# Load dataset from database
+def load_dataset():
+    data = coll.find({},{"_id":0})
+    df = pd.DataFrame(list(data))
     return df
 
 # Standarization Collumns
@@ -109,7 +110,7 @@ def district_mapping(df):
 
 # Run Pipeline
 def pipeline():
-    df = load_dataset(PATH)
+    df = load_dataset()
     df = standard(df)
     df = feature(df)
     df = filtering(df)
@@ -121,7 +122,7 @@ def pipeline():
 
 # Save
 def save(df):
-    df.to_csv('data/processed/jakarta_properties_processed.csv',index=False)
+    df.to_csv('data/processed/jakarta_properties_processed_tes.csv',index=False)
 
 # Save if run in this file
 if __name__ == "__main__":

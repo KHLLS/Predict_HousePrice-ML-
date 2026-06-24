@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_absolute_error, median_absolute_error, mean_absolute_percentage_error
 from sklearn.preprocessing import TargetEncoder
 from xgboost import XGBRegressor
-from prepocessing import pipeline
+from src.ml.preprocessing import pipeline
 import joblib, json
 
 
