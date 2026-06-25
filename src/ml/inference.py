@@ -6,7 +6,8 @@ import json
 class Predictor:
     def __init__(self):
         self.model   = joblib.load("models/model.pkl")
-        self.encoder = joblib.load("models/encoder/encoder.pkl")
+        self.encoder_district = joblib.load("models/encoder/encoder_district.pkl")
+        self.encoder_subdistrict = joblib.load("models/encoder/encoder_subdistrict.pkl")
         with open("models/metrics_model.json") as file:
             self.metrics = json.load(file)
 
@@ -33,15 +34,16 @@ class Predictor:
         df = df.drop(columns=["city"], errors="ignore")
 
         # Target Encoding district
-        df["district"] = self.encoder.transform(df[["district"]]).flatten()
+        df["district"] = self.encoder_district.transform(df[["district"]]).flatten()
+        df["sub_district"] = self.encoder_subdistrict.transform(df[["sub_district"]]).flatten()
 
         # Prediksi
         df        = df[self.model.feature_names_in_]
         price_log = self.model.predict(df)[0]
         price     = np.expm1(price_log)
 
-        # Rentang harga dari median error historis (Q50)
-        margin = price * self.metrics["Q50"]
+        # Rentang harga 
+        margin = price * self.metrics["MAPE"]
         return {
             "price":      round(price),
             "price_low":  round(price - margin),

@@ -19,20 +19,35 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-te = TargetEncoder(
+te_district = TargetEncoder(
     smooth=10,
     cv=5,
     target_type='continuous'
 )
 
-X_train['district'] = te.fit_transform(
+te_subdistrict = TargetEncoder(
+    smooth=10,
+    cv=5,
+    target_type='continuous'
+)
+
+X_train['district'] = te_district.fit_transform(
     X_train[['district']],
     y_train
-).flatten()
+).ravel()
 
-X_test['district'] = te.transform(
+X_test['district'] = te_district.transform(
     X_test[['district']]
-).flatten()
+).ravel()
+
+X_train['sub_district'] = te_subdistrict.fit_transform(
+    X_train[['sub_district']],
+    y_train
+).ravel()
+
+X_test['sub_district'] = te_subdistrict.transform(
+    X_test[['sub_district']]
+).ravel()
 
 # MODEL
 model = XGBRegressor(
@@ -57,7 +72,7 @@ test_pred = model.predict(X_test)
 y_test_true = np.expm1(y_test)
 y_pred_true = np.expm1(test_pred)
 
-print(f"Train R2: {r2_score(y_test_true,y_pred_true)}")
+print(f"Train R2: {r2_score(y_test,test_pred)}")
 print(f"Test R2 : {r2_score(y_test_true,y_pred_true)}")
 print(f"MAE :  {mean_absolute_error(y_test_true,y_pred_true)}")
 print(f"MDAE: {median_absolute_error(y_test_true,y_pred_true)}")
@@ -65,7 +80,8 @@ print(f"MAPE: {mean_absolute_percentage_error(y_test_true,y_pred_true)}")
 
 # SAVE
 joblib.dump(model, 'models/model.pkl')
-joblib.dump(te, 'models/encoder/encoder.pkl')
+joblib.dump(te_district, 'models/encoder/encoder_district.pkl')
+joblib.dump(te_subdistrict, 'models/encoder/encoder_subdistrict.pkl')
 
 error_pct = (np.abs(y_pred_true - y_test_true) / y_test_true)
 metrics = {
@@ -76,7 +92,7 @@ metrics = {
         "MAPE": mean_absolute_percentage_error(y_test_true,y_pred_true),
         "Q25": error_pct.quantile(0.25),
         "Q50": error_pct.quantile(0.50),
-        "Q75": error_pct.quantile(0.75)
+        "Q75": error_pct.quantile(0.75),
     }
 with open('models/metrics_model.json', 'w') as f:
     json.dump(metrics, f, ensure_ascii=False, indent=4)

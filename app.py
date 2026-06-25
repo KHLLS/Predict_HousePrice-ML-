@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import joblib
-from src.inference import Predict
+from src.ml.inference import Predict
 
 def load_data():
     model_main = joblib.load('models/model_main.pkl')

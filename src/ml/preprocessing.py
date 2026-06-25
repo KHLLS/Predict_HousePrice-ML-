@@ -30,8 +30,10 @@ def filtering(df):
     df = df[(df['bedrooms'] <= 30) & (df['bathrooms'] <= 30) & (df['garage'] <= 30)]
     df = df.dropna(axis=0)
     df = df[(df['rumah_sakit'] == 0) & (df['kos'] == 0)]
+    price_per_m2 = df['price_idr'] / df['land_size_m2']
+    df = df[(price_per_m2 >= 1_000_000) & (price_per_m2 <= 150_000_000)]
     lower = df['price_idr'].quantile(0.1)
-    upper = df['price_idr'].quantile(0.98)
+    upper = df['price_idr'].quantile(0.99)
     df = df[
         (df['price_idr'] >= lower) &
         (df['price_idr'] <= upper)
@@ -86,10 +88,11 @@ def district_mapping(df):
         mapping = json.load(file)
 
     df['district'] = df['district'].str.lower()
-    unknown = set(df[~df['district'].isin(mapping.keys())]['district'].unique())
+    df['sub_district'] = df['district'].copy()
+    unknown = set(df[~df['sub_district'].isin(mapping.keys())]['sub_district'].unique())
 
     if len(unknown) > 0:
-        print(f"{len(unknown)} district tidak ada di mapping:")
+        print(f"{len(unknown)} sub district tidak ada di mapping:")
         for d in sorted(unknown):
             print(f" - '{d}'")
 

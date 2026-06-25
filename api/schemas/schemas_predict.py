@@ -3,6 +3,7 @@ from typing import Literal
 
 class PredictRequest(BaseModel):
     district:str
+    sub_district:str
     city:Literal[
             "Jakarta Barat",
             "Jakarta Pusat",
