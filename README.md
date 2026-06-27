@@ -110,39 +110,48 @@ Output: { price, price_low, price_high }
 ```
 Prediksi-Harga/
 │
-├── api/
-│   ├── main.py                     ← FastAPI app entry point
-│   ├── routes/
-│   │   └── routes_predict.py       ← POST /api/v1/predict
-│   └── schemas/
-│       └── schemas_predict.py      ← PredictRequest & PredictResponse
+├── 📁 api/
+│   ├── __init__.py
+│   ├── main.py                          # Entry point FastAPI
+│   ├── 📁 routes/
+│   │   └── routes_predict.py            # Endpoint prediksi harga
+│   └── 📁 schemas/
+│       └── schemas_predict.py           # Pydantic schemas
 │
-├── src/
-│   ├── prepocessing.py             ← Pipeline preprocessing
-│   ├── train.py                    ← Training script
-│   └── inference.py                ← Prediction logic
-│
-├── models/
-│   ├── model.pkl                   ← XGBoost model
-│   ├── encoder/
-│   │   └── encoder.pkl             ← TargetEncoder untuk district
-│   └── metrics_model.json          ← Metrik & error quantile
-│
-├── data/
-│   ├── raw/
+├── 📁 data/
+│   ├── 📁 raw/
 │   │   └── jakarta_properties_raw.csv
-│   ├── processed/
-│   │   └── jakarta_properties_processed.csv
-│   └── district_mapping.json       ← Mapping district → kecamatan
+│   └── 📁 processed/
+│       └── jakarta_properties_processed.csv
 │
-├── notebook/
-│   ├── eda.ipynb                   ← Exploratory Data Analysis
-│   └── train.ipynb                 ← Training eksperimen
+├── 📁 log/
+│   └── unknown_district.log
 │
-├── app.py                          ← Script coba-coba (bukan production)
-├── requirements.txt
-├── .gitignore
-└── README.md
+├── 📁 models/
+│   ├── 📁 encoder/
+│   │   ├── encoder.pkl
+│   │   ├── encoder_district.pkl
+│   │   └── encoder_subdistrict.pkl
+│   ├── model.pkl
+│   └── metrics_model.json
+│
+├── 📁 notebook/
+│   ├── eda.ipynb
+│   └── train.ipynb
+│
+├── 📁 src/
+│   ├── __init__.py
+│   ├── 📁 database/
+│   │   └── config.py
+│   └── 📁 ml/
+│       ├── __init__.py
+│       ├── preprocessing.py
+│       ├── inference.py
+│       └── train.py
+│
+├── 📁 venv/
+├── README.md
+└── requirements.txt
 ```
 
 ---
