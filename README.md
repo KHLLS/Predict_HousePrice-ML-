@@ -31,7 +31,8 @@ Dataset properti Jakarta.
 | Serialization | Joblib, JSON |
 | API | FastAPI, Pydantic |
 | Server | Uvicorn |
-
+| Database | MongoDB |
+| Deployment | Docker |
 ---
 
 ## 🧠 Problem
