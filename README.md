@@ -255,7 +255,7 @@ Dokumentasi interaktif: `http://127.0.0.1:8000/docs`
 - [x] Training dengan TargetEncoder (no data leakage)
 - [x] Inference dengan price range
 - [x] FastAPI endpoint
-- [ ] Docker containerization
+- [x] Docker containerization
 - [ ] Input validation untuk district unknown
 - [ ] Monitoring: track distribusi prediksi
 
