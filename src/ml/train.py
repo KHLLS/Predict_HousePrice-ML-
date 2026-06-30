@@ -94,6 +94,7 @@ metrics = {
         "Q50": error_pct.quantile(0.50),
         "Q75": error_pct.quantile(0.75),
     }
+
 with open('models/metrics_model.json', 'w') as f:
     json.dump(metrics, f, ensure_ascii=False, indent=4)
 

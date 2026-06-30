@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import joblib
 import json
+from src.ml.preprocessing import transform_feature
 
 class Predictor:
     def __init__(self):
@@ -15,17 +16,11 @@ class Predictor:
         df = pd.DataFrame([data])
 
         # Log transform
-        df["land_size_m2"]     = np.log1p(df["land_size_m2"])
-        df["building_size_m2"] = np.log1p(df["building_size_m2"])
+        df = transform_feature(df)
 
         # One-Hot Encoding city
-        city_cols = [
-            "city_Jakarta Barat",
-            "city_Jakarta Pusat",
-            "city_Jakarta Selatan",
-            "city_Jakarta Timur",
-            "city_Jakarta Utara",
-        ]
+        feature = list(self.model.feature_names_in_)
+        city_cols = [c for c in feature if c.startswith('city_')]
         for col in city_cols:
             df[col] = 0
         city_key = f"city_{data['city']}"

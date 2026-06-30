@@ -1,16 +1,18 @@
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Literal, ClassVar, List
+from pathlib import Path
+from src.ml.inference import predictor
+
+def load_city():
+    feature = list(predictor.model.feature_names_in_)
+    city_map = [c.removeprefix('city_') for c in feature if c.startswith('city_')]
+    return city_map
 
 class PredictRequest(BaseModel):
+    city_map:ClassVar[List] = load_city()
     district:str
     sub_district:str
-    city:Literal[
-            "Jakarta Barat",
-            "Jakarta Pusat",
-            "Jakarta Selatan",
-            "Jakarta Timur",
-            "Jakarta Utara",
-                ]
+    city:Literal[*city_map]
     bedrooms:int = Field(gt=0)
     bathrooms:int = Field(gt=0)
     garage:int = Field(ge=0)   

@@ -6,6 +6,7 @@ from src.database.config import coll
 
 MAPPING_PATH = "data/district_mapping.json" # mapping district -> kecamatan
 LOG_UNKNOWN_PATH = "log/unknown_district.log" # log district yang belum ada di mapping
+CITY_PATH = "data/city_mapping.json"
 
 # Load dataset from database
 def load_dataset():
@@ -65,10 +66,14 @@ def feature(df):
         ).astype(int)
     return df
 
-# Transformization
-def transform(df):
+# Transformization Feature
+def transform_feature(df):
     df['land_size_m2'] = np.log1p(df['land_size_m2'])
     df['building_size_m2'] = np.log1p(df['building_size_m2'])
+    return df
+
+# Transformization Target
+def transform_target(df):
     df['price_idr'] = np.log1p(df['price_idr'])
     return df
 
@@ -117,7 +122,8 @@ def pipeline():
     df = standard(df)
     df = feature(df)
     df = filtering(df)
-    df = transform(df)
+    df = transform_feature(df)
+    df = transform_target(df)
     df = encode(df)
     df = drop(df)
     df = district_mapping(df)
