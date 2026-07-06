@@ -37,7 +37,7 @@ class Predictor:
         price_log = self.model.predict(df)[0]
         price     = np.expm1(price_log)
 
-        # Rentang harga 
+        # Rentang harga     
         margin = price * self.metrics["MAPE"]
         return {
             "price":      round(price),

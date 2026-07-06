@@ -118,7 +118,9 @@ def district_mapping(df):
 
 # Run Pipeline
 def pipeline():
+    print("Load Dataset...")
     df = load_dataset()
+    print("Done Load Dataset...")
     df = standard(df)
     df = feature(df)
     df = filtering(df)
@@ -127,6 +129,7 @@ def pipeline():
     df = encode(df)
     df = drop(df)
     df = district_mapping(df)
+    print("Cleaning Done...")
     return df
 
 # Save
