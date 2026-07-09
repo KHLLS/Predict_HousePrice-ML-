@@ -48,66 +48,68 @@ X_train['sub_district'] = te_subdistrict.fit_transform(
 X_test['sub_district'] = te_subdistrict.transform(
     X_test[['sub_district']]
 ).ravel()
-print("Split Dataset...")
 
-# MODEL
-model = XGBRegressor(
-    objective='reg:absoluteerror',
-    max_depth=8,
-    learning_rate=0.01,
-    n_estimators=3600,
-    subsample=0.8,
-    colsample_bytree=0.7,
-    reg_alpha=1,
-    reg_lambda=5,
-    min_child_weight=10,
-    gamma=0.1,
-    random_state=42
-)
+print("SAMPAI SINI")  # tambah ini
+y_binned = pd.qcut(y_train, q=10, labels=False)
+print(y_binned.value_counts().sort_index())
 
-print("Training....")
-model.fit(X_train, y_train)
+# print("Split Dataset...")
 
-# EVALUATION
-train_pred = model.predict(X_train)
-test_pred = model.predict(X_test)
-y_test_true = np.expm1(y_test)
-y_pred_true = np.expm1(test_pred)
+# # MODEL
+# model = XGBRegressor(
+#     objective='reg:absoluteerror',
+#     max_depth=8,
+#     learning_rate=0.01,
+#     n_estimators=3600,
+#     subsample=0.8,
+#     colsample_bytree=0.7,
+#     reg_alpha=1,
+#     reg_lambda=5,
+#     min_child_weight=10,
+#     gamma=0.1,
+#     random_state=42
+# )
 
-print(f"R2: {r2_score(y_test,test_pred)}")
-print(f"MAE :  {mean_absolute_error(y_test_true,y_pred_true)}")
-print(f"MDAE: {median_absolute_error(y_test_true,y_pred_true)}")
-print(f"MAPE: {mean_absolute_percentage_error(y_test_true,y_pred_true)}")
+# print("Training....")
+# model.fit(X_train, y_train)
 
-# SAVE
-joblib.dump(model, 'models/model.pkl')
-joblib.dump(te_district, 'models/encoder/encoder_district.pkl')
-joblib.dump(te_subdistrict, 'models/encoder/encoder_subdistrict.pkl')
+# # EVALUATION
+# train_pred = model.predict(X_train)
+# test_pred = model.predict(X_test)
+# y_test_true = np.expm1(y_test)
+# y_pred_true = np.expm1(test_pred)
 
-error_pct = (np.abs(y_pred_true - y_test_true) / y_test_true)
-metrics = {
-        "Model" : "XGBRegressor",
-        "R2 Score":r2_score(y_test,test_pred),
-        "MAE (mean)":mean_absolute_error(y_test_true,y_pred_true),
-        "MDAE (median)": median_absolute_error(y_test_true,y_pred_true),
-        "MAPE": mean_absolute_percentage_error(y_test_true,y_pred_true),
-        "Q25": error_pct.quantile(0.25),
-        "Q50": error_pct.quantile(0.50),
-        "Q75": error_pct.quantile(0.75),
-        "Q90": error_pct.quantile(0.90),
-        "Q98": error_pct.quantile(0.98),
-        "Q100": error_pct.quantile(1),
-    }
+# print(f"R2: {r2_score(y_test,test_pred)}")
+# print(f"MAE :  {mean_absolute_error(y_test_true,y_pred_true)}")
+# print(f"MDAE: {median_absolute_error(y_test_true,y_pred_true)}")
+# print(f"MAPE: {mean_absolute_percentage_error(y_test_true,y_pred_true)}")
 
-with open('models/metrics_model.json', 'w') as f:
-    json.dump(metrics, f, ensure_ascii=False, indent=4)
+# # SAVE
+# joblib.dump(model, 'models/model.pkl')
+# joblib.dump(te_district, 'models/encoder/encoder_district.pkl')
+# joblib.dump(te_subdistrict, 'models/encoder/encoder_subdistrict.pkl')
 
-print("Saved model")
+# error_pct = (np.abs(y_pred_true - y_test_true) / y_test_true)
+# metrics = {
+#         "Model" : "XGBRegressor",
+#         "R2 Score":r2_score(y_test,test_pred),
+#         "MAE (mean)":mean_absolute_error(y_test_true,y_pred_true),
+#         "MDAE (median)": median_absolute_error(y_test_true,y_pred_true),
+#         "MAPE": mean_absolute_percentage_error(y_test_true,y_pred_true),
+#         "Q25": error_pct.quantile(0.25),
+#         "Q50": error_pct.quantile(0.50),
+#         "Q75": error_pct.quantile(0.75)
+#     }
 
-# FEATURE IMPORTANCE
-feat_imp = pd.DataFrame({
-    'feature': X_train.columns,
-    'importance': model.feature_importances_
-}).sort_values(by='importance', ascending=False)
+# with open('models/metrics_model.json', 'w') as f:
+#     json.dump(metrics, f, ensure_ascii=False, indent=4)
 
-print(feat_imp.head(10))
+# print("Saved model")
+
+# # FEATURE IMPORTANCE
+# feat_imp = pd.DataFrame({
+#     'feature': X_train.columns,
+#     'importance': model.feature_importances_
+# }).sort_values(by='importance', ascending=False)
+
+# print(feat_imp.head(10))
