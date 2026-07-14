@@ -94,15 +94,15 @@ Output: { price, price_low, price_high }
 
 | Metrik | Nilai |
 |---|---|
-| R² Score | **0.865** |
-| MAE (mean) | Rp 2.12 Miliar |
-| MDAE (median) | Rp 729 Juta |
-| MAPE | 21.5% |
-| Error Q25 | 5.7% |
-| Error Q50 (median) | 13.8% |
-| Error Q75 | 27.3% |
+| R² Score | **0.925** |
+| MAE (mean) | Rp 1.95 Miliar |
+| MDAE (median) | Rp 654 Juta |
+| MAPE | 18% |
+| Error Q25 | 4.6% |
+| Error Q50 (median) | 12% |
+| Error Q75 | 23.7% |
 
-> Rentang harga (`price_low` – `price_high`) dihitung dari **Q50 error (13.8%)** secara simetris.
+> Rentang harga (`price_low` – `price_high`) dihitung dari **Q50 error (12%)** secara simetris.
 
 ---
 
