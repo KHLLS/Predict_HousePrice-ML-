@@ -15,10 +15,6 @@ df = pipeline()
 X = df.drop(columns=['price_idr'])
 y = df['price_idr']
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
 te_district = TargetEncoder(
     smooth=1,
     cv=5,
@@ -31,85 +27,50 @@ te_subdistrict = TargetEncoder(
     target_type='continuous'
 )
 
-X_train['district'] = te_district.fit_transform(
-    X_train[['district']],
-    y_train
-).ravel()
+te_district.fit(
+    X[["district"]],
+    y
+)
 
-X_test['district'] = te_district.transform(
-    X_test[['district']],
-).ravel()
+te_subdistrict.fit(
+    X[["sub_district"]],
+    y
+)
 
-X_train['sub_district'] = te_subdistrict.fit_transform(
-    X_train[['sub_district']],
-    y_train
-).ravel()
+X["district"] = te_district.transform(
+    X[["district"]]
+)
 
-X_test['sub_district'] = te_subdistrict.transform(
-    X_test[['sub_district']]
-).ravel()
+X["sub_district"] = te_subdistrict.transform(
+    X[["sub_district"]]
+)
 
-print("SAMPAI SINI")  # tambah ini
-y_binned = pd.qcut(y_train, q=10, labels=False)
-print(y_binned.value_counts().sort_index())
+print("Split Dataset...")
 
-# print("Split Dataset...")
+# MODEL
+model = XGBRegressor(
+    objective='reg:absoluteerror',
+    max_depth=10,
+    learning_rate=0.05953139963770414,
+    n_estimators=2747,
+    subsample=0.8337433250519926,
+    colsample_bytree=0.7543943678414979,
+    reg_alpha=1.716855990003528, #L1 (menimalisasi fitur yang tidak penting agar tidak overfitting)
+    reg_lambda=6.819289477686187, #L2 (menimalisasi nilai koefisien yang besar agar tidak overfitting)
+    min_child_weight=6, 
+    gamma=0.032771478039126015,
+    random_state=42
+)
 
-# # MODEL
-# model = XGBRegressor(
-#     objective='reg:absoluteerror',
-#     max_depth=8,
-#     learning_rate=0.01,
-#     n_estimators=3600,
-#     subsample=0.8,
-#     colsample_bytree=0.7,
-#     reg_alpha=1,
-#     reg_lambda=5,
-#     min_child_weight=10,
-#     gamma=0.1,
-#     random_state=42
-# )
+print("Train Model...")
+model.fit(X, y)
 
-# print("Training....")
-# model.fit(X_train, y_train)
 
-# # EVALUATION
-# train_pred = model.predict(X_train)
-# test_pred = model.predict(X_test)
-# y_test_true = np.expm1(y_test)
-# y_pred_true = np.expm1(test_pred)
+# SAVE
+joblib.dump(model, 'models/model.pkl')
+joblib.dump(te_district, 'models/encoder/encoder_district.pkl')
+joblib.dump(te_subdistrict, 'models/encoder/encoder_subdistrict.pkl')
 
-# print(f"R2: {r2_score(y_test,test_pred)}")
-# print(f"MAE :  {mean_absolute_error(y_test_true,y_pred_true)}")
-# print(f"MDAE: {median_absolute_error(y_test_true,y_pred_true)}")
-# print(f"MAPE: {mean_absolute_percentage_error(y_test_true,y_pred_true)}")
 
-# # SAVE
-# joblib.dump(model, 'models/model.pkl')
-# joblib.dump(te_district, 'models/encoder/encoder_district.pkl')
-# joblib.dump(te_subdistrict, 'models/encoder/encoder_subdistrict.pkl')
+print("Saved model")
 
-# error_pct = (np.abs(y_pred_true - y_test_true) / y_test_true)
-# metrics = {
-#         "Model" : "XGBRegressor",
-#         "R2 Score":r2_score(y_test,test_pred),
-#         "MAE (mean)":mean_absolute_error(y_test_true,y_pred_true),
-#         "MDAE (median)": median_absolute_error(y_test_true,y_pred_true),
-#         "MAPE": mean_absolute_percentage_error(y_test_true,y_pred_true),
-#         "Q25": error_pct.quantile(0.25),
-#         "Q50": error_pct.quantile(0.50),
-#         "Q75": error_pct.quantile(0.75)
-#     }
-
-# with open('models/metrics_model.json', 'w') as f:
-#     json.dump(metrics, f, ensure_ascii=False, indent=4)
-
-# print("Saved model")
-
-# # FEATURE IMPORTANCE
-# feat_imp = pd.DataFrame({
-#     'feature': X_train.columns,
-#     'importance': model.feature_importances_
-# }).sort_values(by='importance', ascending=False)
-
-# print(feat_imp.head(10))
