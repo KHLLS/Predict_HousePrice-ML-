@@ -1,13 +1,15 @@
 from fastapi import APIRouter, HTTPException
-from api.schemas.schemas_predict import PredictRequest, PredictResponse
-from src.ml.inference import predictor
+from app.api.schemas.schemas_predict import PredictRequest, PredictResponse
+from app.services.prediction_service import PredictionService
 
 router = APIRouter()
+service = PredictionService()
+
 
 @router.post("/predict", response_model=PredictResponse)
 def predict_price(body: PredictRequest):
     try:
-        result = predictor.predict(body.model_dump())
+        result = service.predict(body.model_dump())
         return result
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))

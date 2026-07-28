@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.routes.routes_predict import router as predict_router
+from app.api.routes.routes_predict import router as predict_router
 
 app = FastAPI(
     title="Jakarta Property Price Predictor",

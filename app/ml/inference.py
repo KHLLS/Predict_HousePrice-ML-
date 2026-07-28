@@ -2,14 +2,15 @@ import numpy as np
 import pandas as pd
 import joblib
 import json
-from src.ml.preprocessing import transform_feature
+from app.config.settings import settings
+from app.ml.preprocessing import transform_feature
 
 class Predictor:
     def __init__(self):
-        self.model   = joblib.load("models/model.pkl")
-        self.encoder_district = joblib.load("models/encoder/encoder_district.pkl")
-        self.encoder_subdistrict = joblib.load("models/encoder/encoder_subdistrict.pkl")
-        with open("models/metrics_model.json") as file:
+        self.model = joblib.load(settings.MODEL_PATH)
+        self.encoder_district = joblib.load(settings.ENCODER_DISTRICT_PATH)
+        self.encoder_subdistrict = joblib.load(settings.ENCODER_SUBDISTRICT_PATH)
+        with open(settings.METRICS_PATH) as file:
             self.metrics = json.load(file)
 
     def predict(self, data):
