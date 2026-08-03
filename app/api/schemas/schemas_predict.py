@@ -1,10 +1,10 @@
 from pydantic import BaseModel, Field
-from typing import Literal, ClassVar, List
+from typing import ClassVar, List
 from app.ml.inference import predictor
 
 
 def load_city():
-    feature = list(predictor.model.feature_names_in_)
+    feature = list(predictor.pipeline.feature_names_in_)
     city_map = [c.removeprefix("city_") for c in feature if c.startswith("city_")]
     return city_map
 

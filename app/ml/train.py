@@ -1,11 +1,10 @@
-import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_absolute_error, median_absolute_error, mean_absolute_percentage_error
+from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import TargetEncoder
 from xgboost import XGBRegressor
 from app.ml.preprocessing import pipeline
-import joblib, json
+from sklearn.pipeline import Pipeline
+import joblib
 
 
 # LOAD DATA
@@ -14,36 +13,6 @@ df = pipeline()
 # split X Y
 X = df.drop(columns=['price_idr'])
 y = df['price_idr']
-
-te_district = TargetEncoder(
-    smooth=1,
-    cv=5,
-    target_type='continuous'
-)
-
-te_subdistrict = TargetEncoder(
-    smooth=1,
-    cv=5,
-    target_type='continuous'
-)
-
-te_district.fit(
-    X[["district"]],
-    y
-)
-
-te_subdistrict.fit(
-    X[["sub_district"]],
-    y
-)
-
-X["district"] = te_district.transform(
-    X[["district"]]
-)
-
-X["sub_district"] = te_subdistrict.transform(
-    X[["sub_district"]]
-)
 
 print("Split Dataset...")
 
@@ -62,15 +31,33 @@ model = XGBRegressor(
     random_state=42
 )
 
+cat_cols = X.select_dtypes(exclude=np.number).columns
+num_cols = X.select_dtypes(include=np.number).columns
+encoder = ColumnTransformer([
+    (
+        "target_encoder",
+        TargetEncoder(
+            smooth=1,
+            cv=5,
+            target_type="continuous"
+        ),
+        cat_cols
+    ),
+    ("numerical", "passthrough", num_cols),
+],verbose_feature_names_out=False)
+
+pipeline = Pipeline([
+        ("encoder",encoder),
+        ("model",model)
+        ])
+
 print("Train Model...")
-model.fit(X, y)
+
+pipeline.fit(X, y)
 
 
 # SAVE
-joblib.dump(model, 'artifacts/models/model.pkl')
-joblib.dump(te_district, 'artifacts/models/encoder/encoder_district.pkl')
-joblib.dump(te_subdistrict, 'artifacts/models/encoder/encoder_subdistrict.pkl')
-
+joblib.dump(pipeline, "artifacts/models/model.pkl")
 
 print("Saved model")
 
