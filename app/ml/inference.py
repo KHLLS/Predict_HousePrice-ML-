@@ -33,7 +33,8 @@ class Predictor:
             fill_value=0
         )
 
-        # Pipeline otomatis melakukan Target Encoding lalu prediksi        price_log = self.pipeline.predict(df)[0]
+        # Pipeline otomatis melakukan Target Encoding lalu prediksi
+        price_log = self.pipeline.predict(df)[0]
         price     = np.expm1(price_log)
 
         # Rentang harga     
