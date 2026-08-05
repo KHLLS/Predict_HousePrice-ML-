@@ -1,148 +1,132 @@
 # 🏠 Jakarta Property Price Predictor
 
-Sistem prediksi harga properti di Jakarta berbasis Machine Learning dan FastAPI, dengan arsitektur yang lebih terstruktur untuk kebutuhan development dan deployment.
+Aplikasi untuk memperkirakan harga rumah di Jakarta menggunakan model **XGBoost**. Proyek ini menyediakan REST API dengan FastAPI, antarmuka Streamlit, pipeline preprocessing dan training, serta MongoDB sebagai sumber data pelatihan.
 
----
+## Fitur
 
-## Overview
+- Prediksi harga rumah dalam Rupiah berdasarkan lokasi, ukuran properti, jumlah kamar, dan fasilitas.
+- Rentang estimasi harga (`price_low` dan `price_high`) berdasarkan MAPE model.
+- REST API FastAPI beserta dokumentasi Swagger otomatis.
+- UI Streamlit dengan pilihan kota, district, dan sub-district yang saling terkait.
+- Pipeline pembersihan data, feature engineering, encoding kota, dan target encoding untuk lokasi.
+- Import data CSV ke MongoDB dan training ulang model XGBoost.
+- Dukungan menjalankan API dan MongoDB dengan Docker Compose.
+- Notebook untuk exploratory data analysis (EDA) dan eksperimen training.
 
-Project ini memproses data properti Jakarta dari tahap preprocessing, lalu melakukan prediksi harga melalui model XGBoost. Arsitektur aplikasi telah diorganisasi ke lapisan yang lebih jelas:
+## Teknologi
 
-- API layer: FastAPI endpoint
-- Service layer: logika prediksi
-- ML layer: preprocessing dan inference
-- Database layer: repositori MongoDB
-- Infrastructure: konfigurasi dan Docker
+| Area | Teknologi |
+|---| --- |
+| API | FastAPI, Pydantic, Uvicorn |
+| UI | Streamlit |
+| Machine learning | XGBoost, scikit-learn |
+| Penyimpanan data | MongoDB |
+| Deployment | Docker |
 
----
-
-## Tech Stack
-
-| Layer | Library |
-|---|---|
-| Data | Pandas, NumPy |
-| Model | XGBoost, Scikit-learn |
-| Serialization | Joblib, JSON |
-| API | FastAPI, Pydantic |
-| Database | MongoDB |
-| Deployment | Docker, Docker Compose |
-
----
-
-## Project Structure
+## Struktur proyek
 
 ```text
 Prediksi-Harga/
 ├── app/
-│   ├── api/
-│   │   ├── main.py
-│   │   ├── routes/
-│   │   └── schemas/
-│   ├── config/
-│   ├── database/
-│   ├── ml/
-│   ├── schemas/
-│   └── services/
-├── artifacts/
-│   └── models/
+│   ├── api/                 # FastAPI app, route, dan schema request/response
+│   ├── config/              # Pengaturan environment
+│   ├── database/            # Koneksi MongoDB, import CSV, dan repository
+│   ├── ml/                  # Preprocessing, training, dan inference
+│   ├── services/            # Orkestrasi layanan prediksi
+│   └── ui/                  # Aplikasi Streamlit
+├── artifacts/models/        # Model, metrik, dan feature importance
 ├── data/
-├── docker/
-│   ├── Dockerfile
-│   └── docker-compose.yml
-├── notebooks/
-├── scripts/
+│   ├── raw/                 # Dataset mentah (diabaikan Git)
+│   ├── processed/           # Dataset hasil preprocessing (diabaikan Git)
+│   └── district_mapping.json
+├── docker/                  # Dockerfile, Compose, dan startup script
+├── notebooks/               # EDA dan eksperimen training
 ├── tests/
-├── .env
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
----
+## Model dan data
 
-## ML Pipeline
+Model menggunakan `XGBRegressor` dengan target harga yang ditransformasi menggunakan `log1p`. Pada data pelatihan, pipeline melakukan:
 
-Proses ML tetap dipertahankan tanpa mengubah logika yang sudah ada:
+1. Standardisasi tipe data dan pembersihan data tidak valid/outlier.
+2. Ekstraksi fitur `cluster`, `pool`, `mrt`, `tol`, dan `mall` dari judul listing.
+3. Transformasi log untuk luas tanah dan luas bangunan.
+4. One-hot encoding untuk kota dan target encoding untuk `district` serta `sub_district`.
+5. Prediksi lalu transformasi balik ke harga Rupiah.
 
-1. Preprocessing
-   - standardisasi nilai numerik
-   - feature engineering dari kolom title
-   - filtering outlier dan data tidak valid
-   - transformasi logaritmik
-   - encoding untuk city dan district
+Artefak yang digunakan aplikasi:
 
-2. Training
-   - model XGBoost tetap digunakan
-   - encoder target tetap dipakai untuk district
+- `artifacts/models/model.pkl` — pipeline model untuk inference.
+- `artifacts/models/metrics_model.json` — metrik model dan MAPE.
+- `artifacts/models/model_feature.json` — feature importance yang tersimpan.
 
-3. Inference
-   - prediksi harga diikuti rentang estimasi berdasarkan metrics model
+Metrik yang tersimpan saat ini mencatat R² sekitar **0,919** dan MAPE sekitar **19,68%**. Nilai MAPE tersebut digunakan untuk membentuk rentang harga prediksi.
 
-Model artifacts disimpan di [artifacts/models](artifacts/models).
+## Prasyarat
 
----
+- Python 3.12 atau versi Python yang kompatibel dengan dependensi proyek.
+- MongoDB, jika ingin mengimpor data atau melatih ulang model.
+- File model `artifacts/models/model.pkl` untuk menjalankan API/UI. File model dan dataset diabaikan Git, sehingga perlu tersedia secara lokal.
 
-## Environment Configuration
+## Konfigurasi environment
 
-Buat file .env dengan konfigurasi berikut:
+Buat file `.env` di root proyek:
 
 ```env
-MONGO_URI=your_mongodb_uri
+MONGO_URI=mongodb://localhost:27017
 MONGO_DB_NAME=jakarta_properties
 MONGO_COLLECTION_NAME=properties
-```
 
-Nilai tambahan opsional:
-
-```env
+# Opsional: path default berikut sudah digunakan bila tidak diisi
 MODEL_PATH=artifacts/models/model.pkl
-ENCODER_DISTRICT_PATH=artifacts/models/encoder/encoder_district.pkl
-ENCODER_SUBDISTRICT_PATH=artifacts/models/encoder/encoder_subdistrict.pkl
 METRICS_PATH=artifacts/models/metrics_model.json
 ```
 
----
+Untuk MongoDB yang dijalankan lewat Docker Compose, gunakan host `mongodb` dari dalam container API, misalnya:
 
-## Running Locally
+```env
+MONGO_URI=mongodb://admin:password123@mongodb:27017/?authSource=admin
+```
 
-### 1. Install dependencies
+## Menjalankan secara lokal
+
+Instal dependensi:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run API
+Jalankan API:
 
 ```bash
 uvicorn app.api.main:app --reload
 ```
 
-Aplikasi akan tersedia di:
-- API: http://127.0.0.1:8000
-- Docs: http://127.0.0.1:8000/docs
+API dan dokumentasinya tersedia di:
 
----
+- `http://127.0.0.1:8000`
+- `http://127.0.0.1:8000/docs`
 
-## Running with Docker
+Pada terminal lain, jalankan antarmuka Streamlit:
 
 ```bash
-docker compose -f docker/docker-compose.yml up --build
+streamlit run app/ui/streamlit_app.py
 ```
 
-Aplikasi akan berjalan di port 8000.
+Streamlit akan membuka aplikasi di `http://localhost:8501`. Kolom **API base URL** di UI secara default mengarah ke `http://localhost:8000`.
 
----
+## API
 
-## API Usage
+### `POST /api/v1/predict`
 
-### Endpoint
-
-POST /api/v1/predict
-
-### Request Body
+Contoh request:
 
 ```json
 {
   "district": "kebayoran baru",
-  "sub_district": "Kebayoran Baru",
+  "sub_district": "blok m",
   "city": "Jakarta Selatan",
   "bedrooms": 3,
   "bathrooms": 2,
@@ -157,27 +141,57 @@ POST /api/v1/predict
 }
 ```
 
-### Response
+Contoh respons:
 
 ```json
 {
   "price": 4500000000,
-  "price_low": 3878700000,
-  "price_high": 5121300000
+  "price_low": 3614562936,
+  "price_high": 5385437064
 }
 ```
 
----
+`price`, `price_low`, dan `price_high` semuanya dinyatakan dalam Rupiah. Nilai pada contoh hanya ilustrasi; hasil aktual bergantung pada input dan artefak model.
 
-## Notes
+## Menyiapkan data dan training ulang
 
-- Model artifacts tidak dihapus dan tetap dipakai dari [artifacts/models](artifacts/models).
-- Struktur aplikasi telah disesuaikan untuk pendekatan yang lebih production-ready.
-- Endpoint dan output prediksi tetap dijaga agar kompatibel dengan workflow sebelumnya.
+Simpan dataset CSV mentah sebagai `data/raw/jakarta_properties_raw.csv`, kemudian pastikan MongoDB aktif dan konfigurasi `.env` sudah benar.
 
----
+Import CSV ke MongoDB:
 
-## 👨‍💻 Author
+```bash
+python -m app.database.config
+```
 
-**Kahlil Sakha Abdillah**  
-Aspiring ML Engineer
+Latih ulang model:
+
+```bash
+python -m app.ml.train
+```
+
+Pipeline training mengambil seluruh data dari MongoDB, menyimpan model baru ke `artifacts/models/model.pkl`, dan menggunakan pemetaan lokasi pada `data/district_mapping.json`. District/sub-district yang belum terpetakan dicatat di `log/unknown_district.log`.
+
+Untuk eksplorasi data dan eksperimen, gunakan:
+
+- `notebooks/eda.ipynb`
+- `notebooks/train.ipynb`
+
+## Docker Compose
+
+Jalankan MongoDB dan API:
+
+```bash
+docker compose -f docker/docker-compose.yml up --build
+```
+
+Compose mengekspos API di `http://localhost:8000` dan menjalankan Streamlit di dalam container yang sama. Konfigurasi Compose saat ini belum memetakan port Streamlit (`8501`) ke host; untuk memakai UI dari browser, jalankan Streamlit secara lokal seperti pada bagian sebelumnya atau tambahkan mapping port `8501:8501` pada service `api`.
+
+## Pengujian koneksi MongoDB
+
+```bash
+python tests/test_mongo.py
+```
+
+## Author
+
+Kahlil Sakha Abdillah — Aspiring ML Engineer
