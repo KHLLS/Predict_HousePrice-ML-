@@ -1,11 +1,18 @@
+import sys
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 import streamlit as st
 import requests
 import json
-from pathlib import Path
-from app.api.schemas.schemas_predict import load_city
 import csv
 
-BASE_DIR = Path(__file__).resolve().parents[2]
+from app.api.schemas.schemas_predict import load_city
+
 MAPPING_PATH = BASE_DIR / "data" / "district_mapping.json"
 
 st.set_page_config(page_title="Prediksi Harga Properti Jakarta", layout="centered")
