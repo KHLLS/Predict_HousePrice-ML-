@@ -1,7 +1,6 @@
 /.venv/
 __pycache__/
 *.pyc
-data/processed/
 .env
 *.pkl
 mlflow.db
