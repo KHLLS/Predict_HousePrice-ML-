@@ -5,5 +5,5 @@ data/processed/
 .env
 *.pkl
 mlflow.db
-mlartifacts
+mlartifacts/
 .idea/
