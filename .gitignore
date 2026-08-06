@@ -7,4 +7,4 @@ data/processed/
 *.pkl
 mlflow.db
 mlartifacts
-artifacts
+artifacts/
