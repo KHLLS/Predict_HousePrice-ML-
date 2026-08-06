@@ -11,6 +11,7 @@ import requests
 import json
 import csv
 from app.utils.location import load_city
+from app.ml.inference import predictor
 
 MAPPING_PATH = BASE_DIR / "data" / "district_mapping.json"
 
@@ -155,9 +156,10 @@ if submitted:
         "mall": int(mall),
     }
     try:
-        resp = requests.post(f"{api_base.rstrip('/')}/api/v1/predict", json=payload, timeout=10)
-        resp.raise_for_status()
-        result = resp.json()
+        # resp = requests.post(f"{api_base.rstrip('/')}/api/v1/predict", json=payload, timeout=10)
+        # resp.raise_for_status()
+        # result = resp.json()
+        result = predictor.predict(payload)
         st.success("Prediction success")
         st.metric("Estimated Price (IDR)", f"{result['price']:,}")
         st.write("Range:")
