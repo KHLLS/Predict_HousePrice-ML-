@@ -1,9 +1,9 @@
 from pymongo import MongoClient
 import csv
-import os
 from pathlib import Path
+from typing import Any, Dict, Optional, Union
 
-from app.config.settings import settings
+from config.settings import settings
 
 
 NUMERIC_FIELDS = {
@@ -27,27 +27,21 @@ def get_collection():
     return db[settings.MONGO_COLLECTION_NAME]
 
 
-def _coerce_value(key, value):
-    if value is None:
-        return None
-
-    cleaned_value = value.strip()
-    if cleaned_value == "":
+def _coerce_value(key: str, value: Optional[str]) -> Optional[Union[int, float, str]]:
+    if not value or not (cleaned := value.strip()):
         return None
 
     if key in NUMERIC_FIELDS:
         try:
-            if "." in cleaned_value or "e" in cleaned_value.lower():
-                return float(cleaned_value)
-            return int(cleaned_value)
+            return float(cleaned) if "." in cleaned or "e" in cleaned.lower() else int(cleaned)
         except ValueError:
-            return cleaned_value
+            return cleaned
 
-    return cleaned_value
+    return cleaned
 
 
-def insert_csv_to_collection(csv_path=None, collection=None):
-    """Insert rows from a CSV file into MongoDB using insert_many."""
+def insert_csv_to_collection(csv_path: Optional[Union[str, Path]] = None, collection=None) -> Dict[str, Any]:
+    """Mengimpor baris dari file CSV ke dalam koleksi MongoDB."""
     if collection is None:
         collection = get_collection()
 
@@ -57,28 +51,23 @@ def insert_csv_to_collection(csv_path=None, collection=None):
             Path("data/jakarta_properties_raw.csv"),
             Path("raw/jakarta_properties_raw.csv"),
         ]
-        csv_path = None
-        for path in candidate_paths:
-            if path.exists():
-                csv_path = path
-                break
-
+        csv_path = next((p for p in candidate_paths if p.exists()), None)
         if csv_path is None:
-            raise FileNotFoundError("CSV file not found. Expected jakarta_properties_raw.csv in data/raw, data, or raw.")
+            raise FileNotFoundError(
+                "File CSV tidak ditemukan. Harapkan jakarta_properties_raw.csv di data/raw, data, atau raw."
+            )
     else:
         csv_path = Path(csv_path)
 
     if not csv_path.exists():
-        raise FileNotFoundError(f"CSV file not found: {csv_path}")
+        raise FileNotFoundError(f"File CSV tidak ditemukan: {csv_path}")
 
     with csv_path.open("r", encoding="utf-8-sig", newline="") as file:
         reader = csv.DictReader(file)
-        records = []
-        for row in reader:
-            cleaned_row = {}
-            for key, value in row.items():
-                cleaned_row[key] = _coerce_value(key, value)
-            records.append(cleaned_row)
+        records = [
+            {key: _coerce_value(key, value) for key, value in row.items()}
+            for row in reader
+        ]
 
     if not records:
         return {"inserted_count": 0, "file": str(csv_path)}
