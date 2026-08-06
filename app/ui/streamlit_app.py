@@ -1,18 +1,11 @@
-import sys
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
-
 import streamlit as st
 import requests
 import json
-import csv
+from pathlib import Path
 from app.utils.location import load_city
-from app.ml.inference import predictor
+import csv
 
+BASE_DIR = Path(__file__).resolve().parents[2]
 MAPPING_PATH = BASE_DIR / "data" / "district_mapping.json"
 
 st.set_page_config(page_title="Prediksi Harga Properti Jakarta", layout="centered")
@@ -156,10 +149,9 @@ if submitted:
         "mall": int(mall),
     }
     try:
-        # resp = requests.post(f"{api_base.rstrip('/')}/api/v1/predict", json=payload, timeout=10)
-        # resp.raise_for_status()
-        # result = resp.json()
-        result = predictor.predict(payload)
+        resp = requests.post(f"{api_base.rstrip('/')}/api/v1/predict", json=payload, timeout=10)
+        resp.raise_for_status()
+        result = resp.json()
         st.success("Prediction success")
         st.metric("Estimated Price (IDR)", f"{result['price']:,}")
         st.write("Range:")
