@@ -10,8 +10,7 @@ import streamlit as st
 import requests
 import json
 import csv
-
-from app.api.schemas.schemas_predict import load_city
+from app.utils.location import load_city
 
 MAPPING_PATH = BASE_DIR / "data" / "district_mapping.json"
 
