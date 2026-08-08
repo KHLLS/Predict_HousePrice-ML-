@@ -179,7 +179,7 @@ Setelah selesai, seluruh data training akan berada di MongoDB.
 Jalankan training
 
 ```bash
-python -m app.ml.train
+python -m app.ml.mlops
 ```
 
 Training akan melakukan
@@ -248,7 +248,7 @@ http://127.0.0.1:5000
 Setelah menjalankan
 
 ```bash
-python -m app.ml.train
+python -m app.ml.mlops
 ```
 
 akan terbentuk dua buah experiment.
@@ -429,7 +429,7 @@ http://127.0.0.1:8000/docs
 Buka terminal baru
 
 ```bash
-streamlit run app/ui/streamlit_app.py
+streamlit run app/ui/app.py
 ```
 
 UI akan berjalan pada

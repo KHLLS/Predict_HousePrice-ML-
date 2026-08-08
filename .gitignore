@@ -6,3 +6,4 @@ __pycache__/
 mlflow.db
 mlartifacts/
 .idea/
+models

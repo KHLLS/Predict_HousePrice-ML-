@@ -1,9 +1,12 @@
 from pydantic import BaseModel, Field
 from typing import ClassVar, List
-from app.utils.location import load_city
+import json
+
+with open("data/city_mapping.json","r") as f:
+    city_mapping = json.load(f)
 
 class PredictRequest(BaseModel):
-    city_map: ClassVar[List] = load_city()
+    city_map: ClassVar[List] = city_mapping
     district: str
     sub_district: str
     city: str

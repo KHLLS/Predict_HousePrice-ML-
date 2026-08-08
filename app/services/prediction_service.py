@@ -1,5 +1,4 @@
-from app.ml.inference import predictor
-
+from app.inference import predictor
 
 class PredictionService:
     def predict(self, payload: dict):

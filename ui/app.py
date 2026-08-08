@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import json
 from pathlib import Path
-from app.utils.location import load_city
 import csv
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -11,7 +10,8 @@ MAPPING_PATH = BASE_DIR / "data" / "district_mapping.json"
 st.set_page_config(page_title="Prediksi Harga Properti Jakarta", layout="centered")
 st.title("Prediksi Harga Properti Jakarta")
 
-city_map = load_city()
+with open("data/city_mapping.json","r")as f:
+    city_map = json.load(f)
 
 # API base URL (adjust if your FastAPI runs elsewhere)
 api_base = st.text_input("API base URL", value="http://localhost:8000")
