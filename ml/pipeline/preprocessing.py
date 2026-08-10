@@ -8,7 +8,6 @@ from database.loader import DatasetLoader
 
 
 class Preprocessing:
-    """Preprocessing pipeline dengan state di instance (df, mapping, path)."""
 
     def __init__(
         self,
