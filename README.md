@@ -66,7 +66,10 @@ Prediksi-Harga/
 │
 ├── tests/
 ├── log/
-├── requirements.txt
+├── app/requirements_app.txt     # Dependency FastAPI
+├── ml/requirements_ml.txt       # Dependency training / MLflow
+├── ui/requirements_ui.txt       # Dependency Streamlit
+├── requirements.txt             # Aggregator (semua service + pytest)
 └── README.md
 ```
 
@@ -91,8 +94,23 @@ cd Prediksi-Harga
 
 Install dependency
 
+Install semua service (local development):
+
 ```bash
 pip install -r requirements.txt
+```
+
+Atau install per service:
+
+```bash
+# FastAPI (app)
+pip install -r app/requirements_app.txt
+
+# Machine Learning pipeline
+pip install -r ml/requirements_ml.txt
+
+# Streamlit UI
+pip install -r ui/requirements_ui.txt
 ```
 
 ---
@@ -161,7 +179,7 @@ data/raw/jakarta_properties_raw.csv
 Kemudian jalankan
 
 ```bash
-python -m app.database.config
+python -m app.database.config_ui
 ```
 
 Script tersebut akan
@@ -179,7 +197,7 @@ Setelah selesai, seluruh data training akan berada di MongoDB.
 Jalankan training
 
 ```bash
-python -m app.ml.mlops
+python -m app.ml.ml
 ```
 
 Training akan melakukan
@@ -248,7 +266,7 @@ http://127.0.0.1:5000
 Setelah menjalankan
 
 ```bash
-python -m app.ml.mlops
+python -m app.ml.ml
 ```
 
 akan terbentuk dua buah experiment.

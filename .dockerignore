@@ -7,7 +7,7 @@ __pycache__
 .vscode
 notebooks/
 *.ipynb
-data/raw
+ml/dataset/raw
 mlruns
-mlflow.db
-mlartifacts
+artifacts/mlflow/mlflow.db
+artifacts/mlflow/mlartifacts

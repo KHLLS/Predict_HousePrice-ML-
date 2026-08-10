@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 .env
 *.pkl
-mlflow.db
-mlartifacts/
+artifacts/mlflow/mlflow.db
+artifacts/mlflow/mlartifacts/
 .idea/
-models
+artifacts/models
