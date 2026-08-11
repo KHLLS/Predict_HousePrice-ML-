@@ -42,10 +42,7 @@ with open(DISTRICTS_BY_CITY_PATH, "r", encoding="utf-8") as file:
 # API
 # =========================
 
-api_base = st.text_input(
-    "API base URL",
-    value=settings.API_URL
-)
+api_base = settings.API_URL
 
 
 # =========================
