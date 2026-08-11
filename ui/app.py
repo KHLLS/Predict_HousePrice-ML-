@@ -1,8 +1,14 @@
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
+
 import json
 import requests
 import streamlit as st
 
-from ui.config_ui.ui import settings
+from config_ui.ui import settings
 
 
 DISTRICT_PATH = settings.DISTRICT_MAPPING_PATH
