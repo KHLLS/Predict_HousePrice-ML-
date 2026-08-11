@@ -161,7 +161,7 @@ class Preprocessing:
 
     def save(
         self,
-        path: str = "dataset/processed/jakarta_properties_processed.csv",
+        path: str = settings.PROCESSED_DATASET,
     ):
         if self.df is None:
             raise ValueError("DataFrame kosong. Jalankan run() dulu sebelum save().")
@@ -171,12 +171,7 @@ class Preprocessing:
 def pipeline():
     return Preprocessing().run()
 
-
-def save(df: pd.DataFrame):
-    df.to_csv("dataset/processed/jakarta_properties_processed.csv", index=False)
-
-
 if __name__ == "__main__":
     preprocessor = Preprocessing()
     df = preprocessor.run()
-    preprocessor.save(df)
+    preprocessor.save()

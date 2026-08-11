@@ -1,14 +1,17 @@
 import pandas as pd
 from database.client import get_collection
+from database.config_db import settings
 
 def insert_csv_to_collection(csv_path):
     collection = get_collection()
 
     df = pd.read_csv(csv_path)
 
-    df = df.where(pd.notnull(df), None)
-
-    data = df.to_dict("records")
+    data = (
+        df.astype(object)
+        .where(pd.notnull(df), None)
+        .to_dict("records")
+    )
 
     if not data:
         return 0
@@ -18,4 +21,4 @@ def insert_csv_to_collection(csv_path):
     return len(result.inserted_ids)
 
 if __name__ == "__main__":
-    print(insert_csv_to_collection("dataset/raw/jakarta_properties_raw.csv"))
+    print(insert_csv_to_collection(settings.RAW_DATASET))

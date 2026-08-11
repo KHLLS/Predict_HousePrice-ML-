@@ -1,5 +1,5 @@
 import mlflow
-from config.base import settings
+from ml.config_ml.ml import settings
 
 class MLflowRegister():
     def __init__(self):

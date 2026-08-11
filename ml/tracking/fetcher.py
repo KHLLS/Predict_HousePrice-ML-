@@ -1,6 +1,6 @@
 import mlflow, joblib, json
 from mlflow.tracking import MlflowClient
-from config.base import settings
+from ml.config_ml.ml import settings
 
 class MLflowLoader:
 
@@ -31,6 +31,6 @@ print(load_metrics)
 
 if __name__ == "__main__":
     # Save loader
-    joblib.dump(load_pipeline,"models/pipeline_model.pkl")
-    with open("models/metrics.json","w") as f:
+    joblib.dump(load_pipeline,settings.MODEL_PATH)
+    with open(settings.METRICS_PATH,"w") as f:
         json.dump(load_metrics,f, indent=4)

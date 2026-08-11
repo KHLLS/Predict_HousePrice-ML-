@@ -5,9 +5,9 @@ from sklearn.metrics import (r2_score, mean_absolute_error, median_absolute_erro
 mean_absolute_percentage_error, mean_squared_error)
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
-from train.training.preprocessing import pipeline
+from ml.pipeline.preprocessing import pipeline
 from sklearn.pipeline import Pipeline
-from config.base import settings
+from ml.config_ml.ml import settings
 import mlflow
 from mlflow.sklearn import SERIALIZATION_FORMAT_CLOUDPICKLE
 

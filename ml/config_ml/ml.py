@@ -1,11 +1,11 @@
 from config.base import BaseConfig
-from pathlib import Path
+
 
 class MLConfig(BaseConfig):
-    # Tambahan khusus MLops
-    MLFLOW_TRACKING_URI: str = "http://localhost:5000"
-    MLFLOW_MODEL_NAME: str = "harga-rumah-jakarta"
-    MLFLOW_EXPERIMENT_NAME: str = "prediksi-harga"
-
+    # Tambahan khusus ML
+    MLFLOW_TRACKING_URI : str
+    MLFLOW_MODEL_NAME : str
+    MLFLOW_RUN_ID_MODEL : str
+    MLFLOW_RUN_ID_METRIC : str
 
 settings = MLConfig()

@@ -1,7 +1,7 @@
 import numpy as np
 import joblib, json
 import pandas as pd
-from app.config_app.app import settings
+from config.base import settings
 
 class Predictor:
     def __init__(self):

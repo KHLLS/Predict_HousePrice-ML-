@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import ClassVar, List
-from app.config_app.app import settings
+from config.base import settings
 import json
 
 with open(settings.CITY_MAPPING_PATH,"r") as f:

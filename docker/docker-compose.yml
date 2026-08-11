@@ -1,27 +1,23 @@
 services:
   mongodb:
-    image: mongo:7.0
-    container_name: mongodb
+    image: mongo:latest
+    container_name: mongodb-jkt
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_ROOT_USERNAME: admin # cuma default bisa diganti
+      MONGO_INITDB_ROOT_PASSWORD: password123 # sama bisa diganti juga
     ports:
-      - "27017:27017"
+      - "27017:27017" # port lokal dan container 27017
     volumes:
-      - mongodb_data:/dataset/db
-    restart: unless-stopped
+      - mongodb_data:/data/db # Menguhubungkan /data/db dari container mongodb ke volume mongodb _data
 
   api:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/app/Dockerfile # Path Dockerfile
     env_file:
-      - ../.env
-    depends_on:
-      - mongodb
+      - ../.env # Path env (bikin env dlu)
     ports:
-      - "8000:8000"
-    restart: unless-stopped
+      - "8000:8000" # Port FastAPI
 
 volumes:
   mongodb_data:

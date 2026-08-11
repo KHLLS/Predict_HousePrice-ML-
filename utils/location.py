@@ -1,7 +1,5 @@
 import json
-
 import pandas as pd
-
 from app.core.inference import predictor
 from config.base import settings
 
@@ -35,7 +33,7 @@ def load_district_map():
 
 
 def extract_districts_by_city():
-    df = pd.read_csv(settings.PROCESSED_DATA_PATH)
+    df = pd.read_csv(settings.PROCESSED_DATASET)
 
     city_cols = [c for c in df.columns if c.startswith("city_")]
 
@@ -49,11 +47,13 @@ def extract_districts_by_city():
         .to_dict()
     )
 
-    with open(settings.DISTRICTS_BY_CITY_PATH, "w", encoding="utf-8") as f:
+    with open(settings.DISTRICT_BY_CITY, "w", encoding="utf-8") as f:
         json.dump(districts_by_city, f, indent=4, ensure_ascii=False)
 
     return districts_by_city
 
 
 if __name__ == "__main__":
-    extract_districts_by_city()
+    load_city() # Bikin file json di reference untuk mapping city
+    load_district_map() # Bikin file json di reference untuk mapping district
+    extract_districts_by_city() # Bikin file json di reference untuk mapping districy by city

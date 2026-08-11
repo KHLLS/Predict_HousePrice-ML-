@@ -1,7 +1,5 @@
-import pandas as pd
 from pymongo import MongoClient
-from config.base import settings
-
+from database.config_db import settings
 
 def get_collection():
     client = MongoClient(settings.MONGO_URI)
