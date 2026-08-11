@@ -2,7 +2,7 @@ import json
 import requests
 import streamlit as st
 
-from config_ui.ui import settings
+from ui.config_ui.ui import settings
 
 
 DISTRICT_PATH = settings.DISTRICT_MAPPING_PATH
