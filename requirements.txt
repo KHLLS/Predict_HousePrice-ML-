@@ -4,8 +4,8 @@
 #   pip install -r ml/requirements_ml.txt
 #   pip install -r ui/requirements_ui.txt
 
--r app/requirements_app.txt
--r ml/requirements_ml.txt
+#-r app/requirements_app.txt
+#-r ml/requirements_ml.txt
 -r ui/requirements_ui.txt
 
 # Testing

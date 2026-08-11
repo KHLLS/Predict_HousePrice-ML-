@@ -2,36 +2,34 @@
 
 Machine Learning project untuk memprediksi harga rumah di Jakarta menggunakan **XGBoost**, **FastAPI**, **MongoDB**, **MLflow**, dan **Streamlit**.
 
-Project ini dibuat dengan tujuan membangun alur Machine Learning yang lengkap mulai dari preprocessing data, training model, experiment tracking menggunakan MLflow, model registry, hingga deployment sebagai REST API.
+Project ini dibuat dengan tujuan membangun alur Machine Learning yang lengkap mulai dari preprocessing data, training model, experiment tracking menggunakan MLflow, model registry, hingga deployment sebagai REST API dan Web UI.
 
 ---
 
 # ✨ Features
 
-- Prediksi harga rumah di Jakarta
+- Prediksi harga rumah di Jakarta berbasis Machine Learning (XGBoost)
 - REST API menggunakan FastAPI
-- Web UI menggunakan Streamlit
-- Data disimpan pada MongoDB
-- Pipeline preprocessing menggunakan Scikit-Learn
-- Training model menggunakan XGBoost
-- Hyperparameter tuning menggunakan Optuna
-- Experiment Tracking menggunakan MLflow
-- Model Registry menggunakan MLflow
-- Docker Compose untuk menjalankan aplikasi
+- Web UI interaktif menggunakan Streamlit
+- Penyimpanan dataset mentah pada MongoDB
+- Pipeline preprocessing, feature engineering, dan target encoding menggunakan Scikit-Learn
+- Hyperparameter tuning yang sudah dioptimasi menggunakan Optuna
+- Experiment Tracking & Model Registry terintegrasi menggunakan MLflow
+- Dukungan Docker Compose untuk menjalankan database MongoDB dan API Service secara mudah
 
 ---
 
 # 🛠 Tech Stack
 
 | Category | Technology |
-|-----------|------------|
+|-----------|--------|
 | Programming Language | Python |
 | Machine Learning | Scikit-Learn, XGBoost, Optuna |
-| Backend API | FastAPI |
+| Backend API | FastAPI, Uvicorn |
 | Frontend | Streamlit |
 | Database | MongoDB |
 | Experiment Tracking | MLflow |
-| Deployment | Docker |
+| Deployment | Docker, Docker Compose |
 
 ---
 
@@ -40,73 +38,98 @@ Project ini dibuat dengan tujuan membangun alur Machine Learning yang lengkap mu
 ```text
 Prediksi-Harga/
 │
-├── app/
-│   ├── api/                     # FastAPI
-│   ├── database/                # MongoDB
-│   ├── ml/                      # Preprocessing, Training, Inference
-│   ├── services/                # Prediction Service
-│   └── ui/                      # Streamlit
+├── app/                         # FastAPI Application
+│   ├── api/                     # API Routes & Validation Schemas
+│   │   ├── routes/
+│   │   │   └── prediction.py    # Route POST /predict
+│   │   └── schemas/
+│   │       └── prediction.py    # Request & Response Pydantic Schemas
+│   └── core/
+│       └── inference.py         # Inference Engine (memuat model & metrics lokal)
 │
-├── config/
-│   └── settings.py              # Environment Configuration
+├── config/                      # Global Configuration Settings
+│   └── base.py                  # Pydantic BaseSettings untuk load .env
 │
-├── mlflow_utils/
-│   ├── loader.py                # Load model & metrics dari MLflow
-│   └── register.py              # Register model ke Model Registry
+├── database/                    # MongoDB Database Module
+│   ├── client.py                # Koneksi MongoClient
+│   ├── config_db.py             # Konfigurasi MongoDB Settings
+│   ├── insert.py                # Script import CSV ke MongoDB
+│   ├── loader.py                # DatasetLoader cache untuk ML training
+│   └── repository.py            # Abstraksi kueri properti ke MongoDB
 │
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── district_mapping.json
+├── ml/                          # Machine Learning Pipeline & Artifacts
+│   ├── config_ml/               # Konfigurasi khusus MLflow & ML Settings
+│   ├── dataset/                 # Folder Dataset (Raw & Processed CSV)
+│   ├── notebooks/               # Jupyter Notebooks untuk EDA & Prototyping
+│   ├── pipeline/
+│   │   ├── preprocessing.py     # Data Preprocessing, Filtering, & Feature Engineering
+│   │   └── train.py             # Training & Evaluation (Log ke MLflow)
+│   └── tracking/
+│       ├── fetcher.py           # Fetch model registry & metrics dari MLflow ke lokal
+│       └── register.py          # Mendaftarkan model final ke MLflow Model Registry
 │
-├── docker/
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   └── start.sh
+├── artifacts/                   # Penyimpanan Artifact Lokal untuk Inference
+│   ├── metrics/                 # Evaluasi metrics (metrics.json)
+│   ├── mlflow/                  # SQLite DB & directory file untuk MLflow server
+│   └── models/                  # Pipeline Model (pipeline_model.pkl)
 │
-├── tests/
-├── log/
-├── app/requirements_app.txt     # Dependency FastAPI
-├── ml/requirements_ml.txt       # Dependency training / MLflow
-├── ui/requirements_ui.txt       # Dependency Streamlit
-├── requirements.txt             # Aggregator (semua service + pytest)
-└── README.md
+├── reference/                   # Hasil mapping lokasi untuk UI & API validation
+│   ├── city_mapping.json
+│   ├── district_mapping.json
+│   └── districts_by_city.json
+│
+├── ui/                          # Streamlit Frontend Web App
+│   ├── app.py                   # Main Streamlit App
+│   └── config_ui/               # Konfigurasi UI Settings
+│
+├── utils/                       # Python Utility Scripts
+│   └── location.py              # Script generate reference lokasi dari dataset
+│
+├── docker/                      # Docker Configuration
+│   └── app/
+│       └── Dockerfile           # Multi-stage Dockerfile untuk API service
+│
+├── tests/                       # Unit Testing (Pytest)
+├── log/                         # Logging (misal: unknown_district.log)
+├── requirements.txt             # Dependency Aggregator
+├── docker-compose.yml           # Docker Compose untuk MongoDB & API
+├── List_Command.sh              # Kumpulan shortcut perintah penting
+└── README.md                    # Dokumentasi Project
 ```
 
 ---
 
 # ⚙️ Prerequisites
 
-Pastikan telah menginstall:
+Pastikan Anda telah menginstal software berikut di komputer Anda:
 
-- Python 3.12+
-- MongoDB
-- Docker (Opsional)
+- Python 
+- MongoDB (Lokal atau via Docker)
+- Docker & Docker Compose (Opsional)
 - Git
 
-Clone repository
+### Clone Repository
 
 ```bash
-git clone https://github.com/<username>/Prediksi-Harga.git
-
+git clone https://github.com/kahlilsakha/Prediksi-Harga.git
 cd Prediksi-Harga
 ```
 
-Install dependency
+### Install Dependencies
 
-Install semua service (local development):
+Untuk instalasi lengkap (Development lokal):
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Atau install per service:
+Atau instal terpisah sesuai kebutuhan service:
 
 ```bash
-# FastAPI (app)
+# FastAPI (API Service)
 pip install -r app/requirements_app.txt
 
-# Machine Learning pipeline
+# Machine Learning & MLflow Pipeline
 pip install -r ml/requirements_ml.txt
 
 # Streamlit UI
@@ -117,513 +140,343 @@ pip install -r ui/requirements_ui.txt
 
 # ⚙️ Environment Configuration
 
-Buat file `.env`
+Buat file `.env` di direktori utama proyek (sejajar dengan `README.md`). Anda bisa menduplikat dari `.env.example`:
 
 ```env
-# MongoDB
-MONGO_URI=mongodb://admin:password123@localhost:27017/?authSource=admin
-
-# MLflow
+# MLFLOW
 MLFLOW_TRACKING_URI=http://127.0.0.1:5000
 
-# Model Registry
-MLFLOW_MODEL_NAME=xgboost_final_model
-MLFLOW_MODEL_VERSION=1
-
-# Run ID
+# Kedua ID ini didapatkan setelah Anda menjalankan training (Step 3)
 MLFLOW_RUN_ID_MODEL=
 MLFLOW_RUN_ID_METRIC=
+MLFLOW_MODEL_NAME=xgboost_final_model
+
+# MONGODB
+MONGO_URI=mongodb://admin:password123@localhost:27017/
+MONGO_DB_NAME=jakarta_properties
+MONGO_COLLECTION_NAME=properties
 ```
 
-## Penjelasan Environment
+## Penjelasan Environment Variables
 
 | Variable | Description |
 |-----------|-------------|
-| `MONGO_URI` | URI MongoDB |
-| `MLFLOW_TRACKING_URI` | URL MLflow Tracking Server |
-| `MLFLOW_MODEL_NAME` | Nama model pada MLflow Model Registry |
-| `MLFLOW_MODEL_VERSION` | Versi model yang digunakan untuk inference |
-| `MLFLOW_RUN_ID_MODEL` | Run ID hasil Final Training |
-| `MLFLOW_RUN_ID_METRIC` | Run ID hasil Evaluate |
+| `MONGO_URI` | URI koneksi MongoDB |
+| `MONGO_DB_NAME` | Nama database MongoDB yang digunakan |
+| `MONGO_COLLECTION_NAME` | Nama collection tempat menyimpan data properti |
+| `MLFLOW_TRACKING_URI` | URL/URI server MLflow Tracking |
+| `MLFLOW_MODEL_NAME` | Nama model terdaftar pada MLflow Model Registry |
+| `MLFLOW_RUN_ID_MODEL` | Run ID dari experiment **Final Training** untuk memuat model pipeline |
+| `MLFLOW_RUN_ID_METRIC` | Run ID dari experiment **Evaluate** untuk memuat evaluasi MAPE |
 
-> **Catatan**
->
-> `MLFLOW_RUN_ID_MODEL` dan `MLFLOW_RUN_ID_METRIC` **belum perlu diisi sekarang**.
->
-> Kedua Run ID tersebut akan didapatkan **setelah proses training selesai** dan akan digunakan oleh aplikasi saat melakukan inference.
+> **Catatan:**
+> Nilai `MLFLOW_RUN_ID_MODEL` dan `MLFLOW_RUN_ID_METRIC` **dibiarkan kosong dulu saat pertama kali setup**. Anda akan mengisinya setelah menjalankan proses training model.
 
 ---
 
 # 🗄️ Step 1 — Menjalankan MongoDB
 
-Pastikan MongoDB sudah berjalan.
-
-Jika menggunakan Docker:
+Pastikan MongoDB sudah berjalan. Jika menggunakan Docker Compose:
 
 ```bash
-docker compose -f docker/docker-compose.yml up mongodb -d
+docker compose up mongodb -d
 ```
 
-Pastikan MongoDB dapat diakses menggunakan URI pada file `.env`.
+Pastikan MongoDB dapat diakses menggunakan URI yang Anda konfigurasi di dalam file `.env`.
 
 ---
 
 # 📥 Step 2 — Import Dataset ke MongoDB
 
-Simpan dataset mentah pada
-
-```
-data/raw/jakarta_properties_raw.csv
-```
-
-Kemudian jalankan
-
-```bash
-python -m app.database.config_ui
-```
-
-Script tersebut akan
-
-- Membaca dataset CSV
-- Membersihkan data awal
-- Mengimport seluruh data ke MongoDB
-
-Setelah selesai, seluruh data training akan berada di MongoDB.
-
----
-
-# 🤖 Step 3 — Training Model
-
-Jalankan training
-
-```bash
-python -m app.ml.ml
-```
-
-Training akan melakukan
-
-- Load data dari MongoDB
-- Data preprocessing
-- Feature Engineering
-- Target Encoding
-- One Hot Encoding
-- Train XGBoost
-- Evaluate model
-- Final Training
-- Log ke MLflow
-- Register Model
-
-Diagram training
+Pastikan dataset mentah diletakkan pada:
 
 ```text
-MongoDB
-    │
-    ▼
-Preprocessing
-    │
-    ▼
-Feature Engineering
-    │
-    ▼
-Target Encoding
-    │
-    ▼
-XGBoost Training
-    │
-    ├──────────────► Evaluate Experiment
-    │
-    └──────────────► Final Training
+ml/dataset/raw/jakarta_properties_raw.csv
 ```
+
+Kemudian jalankan script import data berikut:
+
+```bash
+python -m database.insert
+```
+
+Script ini akan membaca file CSV, membersihkan tipe data awal (mengganti nilai kosong dengan `None`), dan mengimpor seluruh records ke dalam MongoDB.
 
 ---
 
-# 📊 Step 4 — MLflow
+# 📊 Step 3 — Menjalankan MLflow Tracking Server
 
-Project ini menggunakan **MLflow** untuk melakukan:
+Sebelum melakukan training, Anda wajib menjalankan MLflow Tracking Server terlebih dahulu agar metric, parameter, dan model artifact dapat disimpan dengan benar.
 
-- Experiment Tracking
-- Parameter Logging
-- Metric Logging
-- Artifact Logging
-- Model Registry
-
-Jalankan MLflow Tracking Server
+Jalankan perintah berikut:
 
 ```bash
-mlflow ui
+mlflow server \
+  --backend-store-uri sqlite:///artifacts/mlflow/mlflow.db \
+  --default-artifact-root ./artifacts/mlflow/mlartifacts \
+  --port 5000
 ```
 
-Dashboard MLflow dapat diakses pada
-
-```
-http://127.0.0.1:5000
-```
+Dashboard MLflow sekarang dapat diakses melalui browser pada alamat:
+👉 **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
 
 ---
 
-## Experiment yang dibuat
+# 🤖 Step 4 — Training Model
 
-Setelah menjalankan
+Setelah database terisi dan MLflow server aktif, jalankan script training model:
 
 ```bash
-python -m app.ml.ml
+python -m ml.pipeline.train
 ```
 
-akan terbentuk dua buah experiment.
+Proses ini secara otomatis akan menjalankan:
+1. **Load Data:** Menarik dataset asli dari MongoDB.
+2. **Preprocessing & Cleaning:** Memfilter pencilan (outliers), membersihkan data kosong, mengonversi log-transform pada luas tanah & bangunan, serta log-transform pada target harga (`price_idr`).
+3. **Feature Engineering:** Mengekstrak fitur boolean baru seperti `cluster`, `pool`, `mrt`, `tol`, dan `mall` dari teks judul properti.
+4. **Target Encoding & One-Hot Encoding:** Mentransformasikan variabel kategorik district dan city secara dinamis dalam format Pipeline Scikit-Learn.
+5. **Evaluasi Model:** Melatih XGBoost Regressor menggunakan split data latih & uji, menghitung metric evaluasi lengkap, lalu melakukan logging ke MLflow pada experiment **`Housing Price Jakarta - Evaluate`**.
+6. **Final Training:** Melatih XGBoost Regressor dengan seluruh dataset terintegrasi, lalu menyimpan pipeline utuh ke MLflow pada experiment **`Housing Price Jakarta - Final Training`**.
+
+---
+
+## 💡 Konfigurasi MLflow Setelah Training
+
+Setelah script `train.py` selesai, buka MLflow Dashboard Anda di `http://127.0.0.1:5000`.
 
 ### 1. Housing Price Jakarta - Evaluate
-
-Experiment ini digunakan untuk menyimpan hasil evaluasi model.
-
-Yang dicatat:
-
-- Parameters
-- Metrics
-- Pipeline Model
-
-Contoh metric
-
-- R² Score
-- MAE
-- MDAE
-- MAPE
-- MSE
-- Q25
-- Q50
-- Q75
-
-Run ID dari experiment ini digunakan untuk mengisi
-
+Experiment ini merekam performa model pada data uji. Dapatkan Run ID dari experiment ini dan salin ke file `.env` sebagai:
 ```env
 MLFLOW_RUN_ID_METRIC=<RUN_ID_EVALUATE>
 ```
 
+Metrics yang dicatat meliputi:
+- **R² Score**
+- **MAE** (Mean Absolute Error)
+- **MDAE** (Median Absolute Error)
+- **MAPE** (Mean Absolute Percentage Error)
+- **MSE** (Mean Squared Error)
+- **Q25, Q50, Q75** (Quantiles dari persentase error)
+
 ---
 
 ### 2. Housing Price Jakarta - Final Training
-
-Experiment ini digunakan untuk melakukan training menggunakan seluruh dataset.
-
-Yang dicatat
-
-- Parameters
-- Final Pipeline
-- Registered Model
-
-Run ID dari experiment ini digunakan untuk mengisi
-
+Experiment ini melatih model di keseluruhan dataset. Dapatkan Run ID dari experiment ini dan salin ke file `.env` sebagai:
 ```env
 MLFLOW_RUN_ID_MODEL=<RUN_ID_FINAL>
 ```
 
 ---
 
-## Mengisi file .env
+# 🔄 Step 5 — Registrasi & Sync Artifacts ke Lokal
 
-Setelah training selesai, buka dashboard MLflow.
+Agar API server kita dapat melakukan prediksi tanpa bergantung langsung ke jaringan MLflow server saat runtime, kita akan menyinkronkan model terdaftar (Model Registry) dan metrics evaluasi ke dalam direktori lokal `/artifacts`.
 
-Salin kedua Run ID.
-
-Contoh
-
-```env
-MLFLOW_RUN_ID_MODEL=77320dadd4844dfca760519fa93cb715
-MLFLOW_RUN_ID_METRIC=897181fe93f04acb829baf1def7ed099
-```
-
-Kemudian pastikan model telah muncul pada menu
-
-```
-Model Registry
-```
-
-dengan nama
-
-```
-xgboost_final_model
-```
-
-dan sesuaikan versinya
-
-```env
-MLFLOW_MODEL_VERSION=1
-```
-
----
-
-# 📂 Folder mlflow_utils
-
-Folder ini berisi helper yang digunakan untuk berinteraksi dengan MLflow.
-
-```text
-mlflow_utils/
-├── loader.py
-└── register.py
-```
-
----
-
-## loader.py
-
-Digunakan saat proses inference.
-
-Loader bertugas mengambil seluruh asset yang diperlukan dari MLflow.
-
-Yang di-load
-
-- Pipeline Model
-- Evaluation Metrics
-
-Pipeline digunakan untuk melakukan prediksi.
-
-Metrics digunakan untuk menghitung rentang estimasi harga (`price_low` dan `price_high`).
-
-Alur kerjanya
-
-```text
-MLflow
-│
-├── Model Registry
-│      │
-│      ▼
-│   Load Pipeline
-│
-└── Evaluate Run
-       │
-       ▼
-   Load Metrics
-        │
-        ▼
-prediction_service.py
-```
-
----
-
-## register.py
-
-Digunakan setelah proses Final Training selesai.
-
-Tugasnya adalah
-
-- Mengambil model dari Run MLflow
-- Register model ke Model Registry
-
-Setelah berhasil diregister, model dapat dipanggil hanya menggunakan
-
-```python
-mlflow.sklearn.load_model(
-    "models:/xgboost_final_model/1"
-)
-```
-
-tanpa perlu mengetahui lokasi file `.pkl`.
-
----
-
-# 🚀 Step 5 — Menjalankan FastAPI
-
-Setelah model berhasil diregister ke MLflow, jalankan API.
+### 1. Daftarkan Model ke MLflow Registry
+Jalankan perintah ini untuk mendaftarkan final model Anda ke model registry MLflow:
 
 ```bash
-uvicorn app.api.main:app --reload
+python -m ml.tracking.register
 ```
 
-API tersedia pada
+Model Anda sekarang terdaftar dengan nama `xgboost_final_model` pada MLflow Model Registry.
 
-```
-http://127.0.0.1:8000
-```
-
-Swagger Documentation
-
-```
-http://127.0.0.1:8000/docs
-```
-
----
-
-# 🎨 Step 6 — Menjalankan Streamlit
-
-Buka terminal baru
+### 2. Ambil Model & Metrics ke Lokal (Fetch)
+Jalankan script fetcher untuk mendownload model pipeline (`pipeline_model.pkl`) dan evaluasi MAPE (`metrics.json`) ke folder `artifacts/`:
 
 ```bash
-streamlit run app/ui/app.py
+python -m ml.tracking.fetcher
 ```
 
-UI akan berjalan pada
+### 3. Generate Referensi Lokasi
+UI Streamlit dan validasi FastAPI memerlukan daftar kota, distrik, dan sub-distrik yang valid berdasarkan dataset. Generate file JSON pemetaan tersebut dengan menjalankan:
 
-```
-http://localhost:8501
+```bash
+python -m utils.location
 ```
 
-Pastikan FastAPI sudah berjalan sebelum membuka Streamlit.
+Langkah ini akan menghasilkan tiga file pemetaan di dalam folder `reference/`:
+- `city_mapping.json`
+- `district_mapping.json`
+- `districts_by_city.json`
 
 ---
 
-# 🔌 REST API
+# 🚀 Step 6 — Menjalankan FastAPI
+
+Setelah file model lokal (`artifacts/models/pipeline_model.pkl`) dan konfigurasi reference lokasi terbentuk, jalankan API server:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+API tersedia di:
+👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+
+Dokumentasi Interaktif Swagger (OpenAPI docs):
+👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
+
+---
+
+# 🎨 Step 7 — Menjalankan Streamlit UI
+
+Buka terminal baru untuk menjalankan UI Streamlit:
+
+```bash
+PYTHONPATH=. streamlit run ui/app.py
+```
+
+Web UI interaktif akan terbuka di browser Anda melalui alamat:
+👉 **[http://localhost:8501](http://localhost:8501)**
+
+---
+
+# 🔌 REST API Documentation
 
 ## POST `/api/v1/predict`
 
-Digunakan untuk memprediksi harga rumah.
+Digunakan untuk memprediksi perkiraan harga rumah berdasarkan spesifikasi tertentu.
 
-### Request
-
-```json
-{
-    "district":"kebayoran baru",
-    "sub_district":"blok m",
-    "city":"Jakarta Selatan",
-    "bedrooms":3,
-    "bathrooms":2,
-    "garage":1,
-    "land_size_m2":120,
-    "building_size_m2":150,
-    "cluster":0,
-    "pool":0,
-    "mrt":1,
-    "tol":0,
-    "mall":1
-}
-```
-
-### Response
+### Request Body (JSON)
 
 ```json
 {
-    "price":4500000000,
-    "price_low":3614562936,
-    "price_high":5385437064
+  "district": "kebayoran baru",
+  "sub_district": "blok m",
+  "city": "Jakarta Selatan",
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "garage": 1,
+  "land_size_m2": 120,
+  "building_size_m2": 150,
+  "cluster": 0,
+  "pool": 0,
+  "mrt": 1,
+  "tol": 0,
+  "mall": 1
 }
 ```
 
----
+### Response Body (JSON)
 
-## Validation Rules
+```json
+{
+  "price": 4500000000,
+  "price_low": 3614562936,
+  "price_high": 5385437064
+}
+```
+
+### Pydantic Validation Rules
 
 | Field | Rule |
 |--------|------|
-| bedrooms | > 0 |
-| bathrooms | > 0 |
-| garage | ≥ 0 |
-| land_size_m2 | > 30 |
-| building_size_m2 | > 30 |
-| cluster | 0 / 1 |
-| pool | 0 / 1 |
-| mrt | 0 / 1 |
-| tol | 0 / 1 |
-| mall | 0 / 1 |
+| `bedrooms` | `> 0` |
+| `bathrooms` | `> 0` |
+| `garage` | `≥ 0` |
+| `land_size_m2` | `> 30` |
+| `building_size_m2` | `> 30` |
+| `cluster` | `0` atau `1` (binary) |
+| `pool` | `0` atau `1` (binary) |
+| `mrt` | `0` atau `1` (binary) |
+| `tol` | `0` atau `1` (binary) |
+| `mall` | `0` atau `1` (binary) |
 
 ---
 
-# 🐳 Docker
+# 🐳 Docker Deployment
 
-Build seluruh service
+Gunakan Docker Compose untuk membangun dan menjalankan database serta REST API FastAPI sekaligus secara instan dalam container terisolasi:
 
 ```bash
-docker compose -f docker/docker-compose.yml up --build
+docker compose up --build
 ```
 
-Service yang dijalankan
-
-- MongoDB
-- FastAPI
-- Streamlit
+Langkah ini akan membangun service API berdasarkan `docker/app/Dockerfile` dan menjalankan MongoDB instance sesuai dengan parameter `.env` Anda.
 
 ---
 
-# 🔮 Inference Workflow
+# 🔮 Inference & Estimation Range Workflow
 
-Saat menerima request prediksi, aplikasi **tidak membaca file model lokal**.
-
-Seluruh asset diambil langsung dari MLflow.
-
-Workflow
+Alur kerja estimasi harga rumah tidak hanya mengeluarkan nilai prediksi tunggal, melainkan menyajikan rentang harga atas (`price_high`) dan bawah (`price_low`) menggunakan persentase deviasi **MAPE** (Mean Absolute Percentage Error) dari model hasil evaluasi.
 
 ```text
-User
- │
- ▼
-FastAPI
- │
- ▼
-prediction_service.py
- │
- ▼
-mlflow_utils.loader
- │
- ├──────────────► Load Pipeline
- │
- └──────────────► Load Metrics
-                  │
-                  ▼
-          Predict House Price
-                  │
-                  ▼
- Calculate Price Range (MAPE)
-                  │
-                  ▼
-            JSON Response
+User Input (Streamlit UI)
+            │
+            ▼
+   FastAPI Request JSON
+            │
+            ▼
+    Inference Engine (app/core/inference.py)
+            │
+            ├─── Log Transform: land_size_m2, building_size_m2
+            ├─── One-Hot Encoding: city
+            ├─── Target Encoding: district (via Pipeline Model)
+            │
+            ▼
+    Predict base price (XGBoost) ──► Re-exponentiate (expm1)
+            │
+            ├─── Get MAPE (from artifacts/metrics/metrics.json)
+            ├─── Calculate Margin = price * MAPE
+            │
+            ├─── Price Low  = price - Margin
+            └─── Price High = price + Margin
+            │
+            ▼
+   FastAPI Response JSON
 ```
 
-Pipeline digunakan untuk menghasilkan prediksi harga rumah.
-
-Sedangkan nilai **MAPE** digunakan untuk menghitung rentang estimasi harga:
-
-- `price`
-- `price_low`
-- `price_high`
-
-Dengan pendekatan ini, aplikasi selalu menggunakan model yang berada pada **MLflow Model Registry**, sehingga deployment tidak bergantung pada file `.pkl` lokal.
+Dengan desain arsitektur decoupling ini, runtime prediksi API server dan UI sepenuhnya bebas dari latency server MLflow karena memanfaatkan artifact lokal (`/artifacts`), sementara alur update model tetap sangat fleksibel via command tracking sync (`fetcher.py`).
 
 ---
 
-# 🏗 Overall Architecture
+# 🏗️ Overall Architecture Flow
 
 ```text
-                 Raw Dataset
-                      │
-                      ▼
-                  MongoDB
-                      │
-                      ▼
-              Data Preprocessing
-                      │
-                      ▼
-            Feature Engineering
-                      │
-                      ▼
-               XGBoost Training
-                      │
-        ┌─────────────┴─────────────┐
-        ▼                           ▼
-Evaluate Experiment         Final Training
-        │                           │
-        ▼                           ▼
- Evaluation Metrics         Register Model
-        │                           │
-        └─────────────┬─────────────┘
-                      ▼
-                 MLflow Server
-                      │
-          ┌───────────┴───────────┐
-          ▼                       ▼
-    Model Registry          Experiment Runs
-          │                       │
-          └───────────┬───────────┘
-                      ▼
-              mlflow_utils.loader
-                      │
-                      ▼
-             Prediction Service
-                      │
-             ┌────────┴────────┐
-             ▼                 ▼
-         FastAPI          Streamlit UI
-                      │
-                      ▼
-                   End User
+                 Raw Dataset (.csv)
+                         │
+                         ▼
+                     MongoDB
+                         │
+                         ▼
+               Preprocessing & Feature
+                     Engineering
+                         │
+                         ▼
+                  XGBoost Training
+                         │
+        ┌────────────────┴────────────────┐
+        ▼                                 ▼
+Evaluate Run (Data Split)       Final Model Run (Full)
+        │                                 │
+        ▼                                 ▼
+Calculate Evaluation Metrics      Log Pipeline Model
+(R2, MAE, MDAE, MAPE, MSE)                │
+        │                                 ▼
+        │                         MLflow Model Registry
+        │                                 │
+        └────────────────┬────────────────┘
+                         ▼
+                  MLflow Server
+                         │
+                         ▼
+             [ ml.tracking.fetcher ]
+                         │
+      ┌──────────────────┴──────────────────┐
+      ▼                                     ▼
+/artifacts/metrics/                   /artifacts/models/
+(metrics.json)                        (pipeline_model.pkl)
+      │                                     │
+      └──────────────────┬──────────────────┘
+                         ▼
+                 Inference Engine (app.core)
+                         │
+                ┌────────┴────────┐
+                ▼                 ▼
+          FastAPI Server     Streamlit UI
 ```
 
+---
 
 # 👨‍💻 Author
 

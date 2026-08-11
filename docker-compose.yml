@@ -11,11 +11,12 @@ services:
       - mongodb_data:/data/db # Menguhubungkan /data/db dari container mongodb ke volume mongodb _data
 
   api:
+    container_name: api-jkt
     build:
-      context: ..
+      context: .
       dockerfile: docker/app/Dockerfile # Path Dockerfile
     env_file:
-      - ../.env # Path env (bikin env dlu)
+      - .env # Path env (bikin env dlu)
     ports:
       - "8000:8000" # Port FastAPI
 

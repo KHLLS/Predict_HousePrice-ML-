@@ -1,0 +1,54 @@
+{
+    "Jakarta Barat": [
+        "kalideres",
+        "kebon jeruk",
+        "kembangan",
+        "palmerah",
+        "tambora"
+    ],
+    "Jakarta Pusat": [
+        "cempaka putih",
+        "gambir",
+        "johar baru",
+        "kemayoran",
+        "menteng",
+        "sawah besar",
+        "senen",
+        "setiabudi",
+        "taman sari",
+        "tanah abang"
+    ],
+    "Jakarta Selatan": [
+        "cilandak",
+        "jagakarsa",
+        "kebayoran baru",
+        "kebayoran lama",
+        "mampang prapatan",
+        "pancoran",
+        "pasar minggu",
+        "pesanggrahan",
+        "tebet"
+    ],
+    "Jakarta Timur": [
+        "cakung",
+        "cipayung",
+        "ciracas",
+        "duren sawit",
+        "jatinegara",
+        "kramat jati",
+        "makasar",
+        "matraman",
+        "pasar rebo",
+        "pulo gadung"
+    ],
+    "Jakarta Utara": [
+        "cengkareng",
+        "cilincing",
+        "grogol petamburan",
+        "kelapa gading",
+        "koja",
+        "pademangan",
+        "penjaringan",
+        "tanjung priok"
+    ]
+}
