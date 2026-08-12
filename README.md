@@ -111,7 +111,7 @@ Pastikan Anda telah menginstal software berikut di komputer Anda:
 ### Clone Repository
 
 ```bash
-git clone https://github.com/KHLLS/Prediksi-Harga.git
+git clone https://github.com/KHLLS/Predict_HousePrice-ML-.git
 cd Prediksi-Harga
 ```
 
