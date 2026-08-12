@@ -36,7 +36,7 @@ Project ini dibuat dengan tujuan membangun alur Machine Learning yang lengkap mu
 # 📁 Project Structure
 
 ```text
-Prediksi-Harga/
+Predict_HousePrice-ML-/
 │
 ├── app/                         # FastAPI Application
 │   ├── api/                     # API Routes & Validation Schemas
@@ -112,7 +112,6 @@ Pastikan Anda telah menginstal software berikut di komputer Anda:
 
 ```bash
 git clone https://github.com/KHLLS/Predict_HousePrice-ML-.git
-cd Prediksi-Harga
 ```
 
 ### Install Dependencies
