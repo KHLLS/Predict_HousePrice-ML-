@@ -1,7 +1,9 @@
-venv/
+/.venv/
 __pycache__/
 *.pyc
-data/raw/
-data/processed/
 .env
 *.pkl
+artifacts/mlflow/mlflow.db
+artifacts/mlflow/mlartifacts/
+.idea/
+artifacts/models
