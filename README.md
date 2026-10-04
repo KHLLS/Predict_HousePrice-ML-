@@ -106,7 +106,7 @@ Output: { price, price_low, price_high }
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Structures
 
 ```
 Prediksi-Harga/
